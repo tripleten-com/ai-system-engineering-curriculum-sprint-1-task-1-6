@@ -7,7 +7,7 @@
 # Concepts: Service orchestration and readiness
 # Tools: Docker Compose
 
-name: coldline-task-1-1
+name: coldline-task-1-6
 
 x-coldline-environment: &coldline-environment
   COLDLINE_DATABASE_URL: postgresql://coldline:coldline_local@postgres:5432/coldline
