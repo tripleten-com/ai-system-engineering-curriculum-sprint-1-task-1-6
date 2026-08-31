@@ -1,0 +1,34 @@
+# Coldline - Task 1.6
+# File: submission-sample.yaml
+# Component: Fictional answer example
+# Purpose: Show the required answer shape without giving Task answers.
+# Interacts With: Submission schema and public verifier
+# Sprint/Task: Sprint 1 - Project 1 / Task 1.6
+# Concepts: Evidence structure
+# Tools: YAML
+
+# Fictional shape example only. These answers do not describe Coldline. All figures below are
+# fictional and independent of the real docs/student/task-1-4-reference-metrics.yaml fixture and
+# the real docs/student/decision-evidence-record.md content.
+answers:
+  decision_evidence_mappings: |
+    Fictional Recommendation: scale the fictional exception worker pool from 2 to 6 fictional
+    processes. Fictional Mapping 1: fictional Task 1.1 baseline confirmed the fictional Redis
+    Streams queue adapter as the only fictional asynchronous hop, ruling out a fictional API-side
+    bottleneck. Fictional Mapping 2: fictional Task 1.3 telemetry repair restored fictional
+    end-to-end trace continuity, letting the fictional Task 1.4 load test attribute latency
+    correctly instead of losing it at a broken fictional span boundary. Fictional Mapping 3:
+    fictional Task 1.4's fictional latency-injection experiment held fictional model-provider
+    latency constant while fictional throughput kept dropping, ruling out the fictional provider as
+    the bottleneck and isolating fictional worker concurrency instead. Fictional Mapping 4:
+    fictional Task 1.5 capacity math, using the fictional measured 0.30 fictional sec/job duration
+    and a fictional 10x peak arrival of 11 fictional jobs/sec, produced a fictional required
+    concurrency of 3.3, rounded up with a fictional 30 percent safety margin to 6 fictional worker
+    processes, which is the number defended here.
+  self_review_checklist: |
+    Fictional self-review complete: fictional evidence record checked against Tasks 1.1-1.5,
+    fictional submission scanned for secrets, and fictional presentation timed under 10 minutes.
+  limitations_statement: |
+    Fictional local Docker Compose tests cannot prove fictional multi-region latency, fictional
+    production cost, or fictional long-term reliability; only fictional staging and production
+    telemetry can confirm the fictional recommendation holds at real 10x traffic.

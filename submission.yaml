@@ -1,0 +1,27 @@
+# Coldline - Task 1.6
+# File: submission.yaml
+# Component: Student answer sheet
+# Purpose: Record the Task 1.6 decision-evidence synthesis, self-review, and limitations statement.
+# Interacts With: Submission schema and public verifier
+# Sprint/Task: Sprint 1 - Project 1 / Task 1.6
+# Concepts: Decision-evidence records, self-review, held-out evaluation
+# Tools: YAML
+
+# Complete each answer after assembling docs/student/decision-evidence-record.md and reviewing your
+# Sprint 1 evidence chain ahead of the instructor technical defense.
+# Empty values and placeholder text fail public verification.
+# Do not submit secrets, personal data, local absolute paths, or protected evaluator details.
+# See submission-sample.yaml for a completed fictional shape.
+answers:
+  # 300-3000 characters. Summarize how each scaling claim in your ADR maps to a specific
+  # measurement or calculation from Tasks 1.1-1.5. See docs/student/decision-evidence-record.md
+  # for the full claim-by-claim table this summary is drawn from.
+  decision_evidence_mappings: |
+    Replace this line with your decision-evidence mapping summary.
+  # 40-500 characters.
+  self_review_checklist: |
+    Replace this line with your self-review checklist confirmation.
+  # 100-1000 characters.
+  limitations_statement: |
+    Replace this line with your limitations statement about what local Docker Compose testing
+    cannot prove.

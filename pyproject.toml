@@ -1,0 +1,138 @@
+# Coldline - Task 1.1
+# File: pyproject.toml
+# Component: Python project contract
+# Purpose: Define one installable project, pinned tools, tests, and Poe commands.
+# Interacts With: src packages, tests, uv.lock
+# Sprint/Task: Sprint 1 - Project 1 / Task 1.1
+# Concepts: Single-project reproducibility
+# Tools: uv, Hatchling, Poe, Ruff, mypy, pytest
+
+[project]
+name = "coldline-task-1-1"
+version = "0.1.0"
+description = "Coldline Task 1.6 — held-out review and defense"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "asyncpg==0.31.0",
+  "opentelemetry-api==1.44.0",
+  "opentelemetry-exporter-otlp==1.44.0",
+  "opentelemetry-instrumentation-redis==0.65b0",
+  "opentelemetry-sdk==1.44.0",
+  "prometheus-client==0.26.0",
+  "pydantic==2.13.4",
+  "pydantic-settings==2.15.0",
+  "redis==5.3.1",
+]
+
+[dependency-groups]
+api = [
+  "fastapi==0.141.1",
+  "opentelemetry-instrumentation-fastapi==0.65b0",
+  "uvicorn==0.52.4",
+]
+worker = []
+dev = [
+  "httpx==0.28.1",
+  "jsonschema==4.26.0",
+  "locust>=2.31",
+  "mypy==2.3.1",
+  "poethepoet==0.48.0",
+  "pytest==9.1.1",
+  "pytest-asyncio==1.4.0",
+  "pyyaml==6.0.3",
+  "ruff==0.16.3",
+]
+
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/api", "src/worker", "src/domain", "src/ports", "src/adapters"]
+
+[tool.uv]
+default-groups = ["api", "worker", "dev"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --import-mode=importlib"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+markers = [
+  "runtime: requires the running Docker Compose stack",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "D"]
+ignore = ["D203", "D213"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = [
+  "src",
+  "infra/scripts",
+  "tests/contract/authoring.py",
+  "tests/contract/runtime_adapters.py",
+  "tests/contract/submission_validation.py",
+  "tests/smoke/readiness.py",
+  "tests/e2e/scenario.py",
+]
+
+[[tool.mypy.overrides]]
+# These runtime libraries do not publish complete typing metadata.
+# Typed boundary wrappers keep their use inside adapters and configuration modules.
+module = ["asyncpg", "jsonschema", "yaml"]
+ignore_missing_imports = true
+
+[tool.poe.tasks]
+format = "ruff format ."
+format-check = "ruff format --check ."
+lint = "ruff check ."
+typecheck = "mypy"
+unit = "pytest tests/unit"
+contract = "pytest tests/contract -m 'not runtime'"
+runtime-contract = "pytest tests/contract -m runtime"
+smoke = "pytest tests/smoke -m runtime"
+e2e = "pytest tests/e2e -m runtime"
+telemetry-repair = "pytest tests/contract/test_telemetry_repair.py -m runtime"
+load-harness = "pytest tests/contract/test_load_harness.py"
+test = ["unit", "contract"]
+preflight = "python infra/scripts/preflight.py"
+start = "docker compose --profile observability up --build --wait"
+ready = "python -m tests.smoke.readiness"
+scenario = "python -m tests.e2e.scenario"
+answers = "python -m tests.contract.submission_validation"
+structure = "python -m tests.contract.authoring"
+compose-config = "docker compose --profile observability config --quiet"
+verify = ["ready", "smoke", "e2e", "answers"]
+author-verify = [
+  "format-check",
+  "lint",
+  "typecheck",
+  "unit",
+  "contract",
+  "structure",
+  "compose-config",
+]
+dogfood-verify = [
+  "author-verify",
+  "ready",
+  "runtime-contract",
+  "smoke",
+  "e2e",
+  "scenario",
+  "restart",
+  "ready",
+  "e2e",
+  "reset",
+]
+restart = "docker compose --profile observability restart api worker"
+reset = "docker compose --profile observability down --volumes --remove-orphans"
+stop = "docker compose --profile observability down --remove-orphans"
+load-test = "locust -f loadtest/locustfile.py --headless --users 2 --spawn-rate 2 --run-time 30s --host http://localhost:${COLDLINE_API_HOST_PORT:-8000}"
+reset-baseline = { shell = "docker compose --profile observability exec -T postgres psql -U coldline -d coldline -c \"TRUNCATE exceptions;\" && docker compose --profile observability exec -T redis redis-cli FLUSHDB" }

@@ -1,0 +1,82 @@
+"""Coldline — Task 1.1.
+
+===================
+
+File:              tests/contract/test_repository_structure.py
+Component:         Repository structure contract
+Purpose:           Keeps the student-visible tree small and predictable.
+Interacts With:    Task root, src packages, docs, infrastructure, and tests
+Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Concepts:          Navigability, package ownership, authoring safety
+Tools:             Python 3.12, pytest
+"""
+
+import subprocess
+from pathlib import Path, PurePosixPath
+
+TASK_ROOT = Path(__file__).resolve().parents[2]
+VISIBLE_CONTENT_DIRECTORIES = {"docs", "src", "infra", "tests", "loadtest"}
+SOURCE_PACKAGES = {"api", "worker", "domain", "ports", "adapters"}
+IGNORED_PARTS = {
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".tools",
+    ".venv",
+    "__pycache__",
+}
+
+
+def test_visible_content_is_grouped_into_five_learning_zones() -> None:
+    """Reject extra visible root directories that fragment navigation."""
+    actual = {
+        path.parts[0]
+        for path in _tracked_task_paths()
+        if len(path.parts) > 1 and not path.parts[0].startswith(".")
+    }
+
+    assert actual == VISIBLE_CONTENT_DIRECTORIES
+
+
+def test_source_tree_exposes_exactly_five_flat_packages() -> None:
+    """Keep application code under the five selected responsibility names."""
+    actual = {
+        path.parts[1]
+        for path in _tracked_task_paths()
+        if len(path.parts) > 2 and path.parts[0] == "src"
+    }
+
+    assert actual == SOURCE_PACKAGES
+
+
+def _tracked_task_paths() -> set[PurePosixPath]:
+    """Return Task-relative paths while working here or after history-free export."""
+    repository = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=TASK_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if repository.returncode != 0:
+        # Published templates have no authoring history. Inspect their materialized
+        # files while ignoring only local tool output created after installation.
+        return {
+            PurePosixPath(path.relative_to(TASK_ROOT).as_posix())
+            for path in TASK_ROOT.rglob("*")
+            if path.is_file() and not any(part in IGNORED_PARTS for part in path.parts)
+        }
+
+    repository_root = Path(repository.stdout.strip())
+    task_prefix = TASK_ROOT.relative_to(repository_root).as_posix()
+    output = subprocess.run(
+        ["git", "ls-files"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()
+    if task_prefix == ".":
+        return {PurePosixPath(path) for path in output}
+    prefix = f"{task_prefix}/"
+    return {PurePosixPath(path.removeprefix(prefix)) for path in output if path.startswith(prefix)}

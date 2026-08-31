@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answers"],
+  "properties": {
+    "answers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_evidence_mappings",
+        "self_review_checklist",
+        "limitations_statement"
+      ],
+      "properties": {
+        "decision_evidence_mappings": { "type": "string", "minLength": 300, "maxLength": 3000 },
+        "self_review_checklist": { "type": "string", "minLength": 40, "maxLength": 500 },
+        "limitations_statement": { "type": "string", "minLength": 100, "maxLength": 1000 }
+      }
+    }
+  }
+}
