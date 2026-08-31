@@ -97,9 +97,9 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-m", "worker.health"]
-      interval: 3s
-      timeout: 3s
-      retries: 20
+      interval: 5s
+      timeout: 10s
+      retries: 12
     networks: [coldline]
 
   jaeger:

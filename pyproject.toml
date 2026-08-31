@@ -135,4 +135,4 @@ restart = "docker compose --profile observability restart api worker"
 reset = "docker compose --profile observability down --volumes --remove-orphans"
 stop = "docker compose --profile observability down --remove-orphans"
 load-test = "locust -f loadtest/locustfile.py --headless --users 2 --spawn-rate 2 --run-time 30s --host http://localhost:${COLDLINE_API_HOST_PORT:-8000}"
-reset-baseline = { shell = "docker compose --profile observability exec -T postgres psql -U coldline -d coldline -c \"TRUNCATE exceptions;\" && docker compose --profile observability exec -T redis redis-cli FLUSHDB" }
+reset-baseline = { shell = "docker compose --profile observability exec -T postgres psql -U coldline -d coldline -c \"TRUNCATE exceptions;\" && docker compose --profile observability exec -T redis redis-cli FLUSHDB && docker compose --profile observability restart worker" }
