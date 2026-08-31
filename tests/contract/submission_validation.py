@@ -112,7 +112,7 @@ def validate_changed_paths(paths: list[str]) -> None:
 
 
 def _changed_paths(root: Path) -> list[str]:
-    """Return changes since the generated repository's protected root commit."""
+    """Return changes since this checkout's published baseline commit."""
     try:
         repository_root = Path(
             subprocess.run(
@@ -127,17 +127,9 @@ def _changed_paths(root: Path) -> list[str]:
             # The authoring snapshot is nested. Only a generated repository's
             # own history defines student changes.
             return []
-        roots = subprocess.run(
-            ["git", "rev-list", "--max-parents=0", "HEAD"],
-            cwd=repository_root,
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.splitlines()
-        if len(roots) != 1:
-            raise RuntimeError("repository must have exactly one protected root commit")
+        baseline = _baseline_commit(repository_root)
         result = subprocess.run(
-            ["git", "diff", "--name-only", roots[0]],
+            ["git", "diff", "--name-only", baseline],
             cwd=repository_root,
             check=True,
             capture_output=True,
@@ -146,6 +138,46 @@ def _changed_paths(root: Path) -> list[str]:
     except subprocess.CalledProcessError as exc:
         raise RuntimeError("Git history is unavailable for protected-path validation") from exc
     return [line for line in result.stdout.splitlines() if line]
+
+
+def _baseline_commit(repository_root: Path) -> str:
+    """Return the commit a student's changes are measured against.
+
+    Student work happens ahead of the repository's published `main` - on a
+    branch, or as uncommitted edits - and later export refreshes legitimately
+    keep advancing `main` after a student has already forked from it. The
+    protected boundary is therefore the commit a student actually started
+    from (their merge-base with `main`), not the repository's very first
+    commit, which an export refresh may since have moved past.
+    """
+    for candidate in ("origin/main", "main"):
+        probe = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", candidate],
+            cwd=repository_root,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode == 0:
+            merge_base = subprocess.run(
+                ["git", "merge-base", "HEAD", candidate],
+                cwd=repository_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            return merge_base.stdout.strip()
+    # No published `main` is reachable (e.g. an unpublished staging export) -
+    # fall back to the repository's single root commit.
+    roots = subprocess.run(
+        ["git", "rev-list", "--max-parents=0", "HEAD"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()
+    if len(roots) != 1:
+        raise RuntimeError("repository must have exactly one protected root commit")
+    return roots[0]
 
 
 def _load_one_document(path: Path) -> dict[str, Any]:
