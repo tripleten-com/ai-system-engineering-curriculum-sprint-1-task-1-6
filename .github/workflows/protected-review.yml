@@ -28,9 +28,25 @@ jobs:
     # github.event.pull_request context that the checkout ref and the path gate below depend on; under
     # any other event those expressions silently evaluate to empty and both protections degrade to
     # no-ops. The same-repo check keeps a fork's PR from triggering a secret-scoped run at all.
+    #
+    # The final clause skips generated export PRs, which regenerate the whole template and so can
+    # never satisfy the two-path boundary below — before it, every export PR tripped this gate and
+    # reported a permanent, meaningless failure.
+    #
+    # Note carefully that `github.head_ref` is ATTACKER-CONTROLLED: a student chooses their own
+    # branch name, and a bare `startsWith(github.head_ref, 'export/')` skip would let them dodge
+    # held-out grading just by naming a branch `export/anything`. That is why the skip additionally
+    # requires an OWNER/MEMBER author association, which a student submitting from outside the org
+    # cannot set. Residual risk: an org member could still self-skip, so this narrows the gate
+    # rather than closing it completely. Skipping produces no grade, not a passing grade, and a
+    # missing held-out result is visible to the instructor.
     if: >-
       github.event_name == 'pull_request_target'
       && github.event.pull_request.head.repo.full_name == github.repository
+      && !(
+        startsWith(github.head_ref, 'export/')
+        && contains(fromJSON('["OWNER","MEMBER"]'), github.event.pull_request.author_association)
+      )
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
