@@ -1,4 +1,4 @@
-"""Coldline — Task 1.6.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/held_out_review.py
 Component:         Contract — Held-out review
 Purpose:           Replay a held-out scenario and grade the result without exposing expected values.
 Interacts With:    The live API, a runtime-supplied held-out scenario definition
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.6
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Held-out evaluation
 Tools:             Python 3.12, httpx
 """

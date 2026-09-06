@@ -1,4 +1,4 @@
-"""Coldline — Task 1.6.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/test_held_out_review_module.py
 Component:         Contract — Held-out review dry run
 Purpose:           Confirm the held-out check mechanism works, using a fake, non-secret scenario.
 Interacts With:    tests.contract.held_out_review, the live API
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.6
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Held-out evaluation
 Tools:             Python 3.12, pytest, httpx
 """

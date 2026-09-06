@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/unit/adapters/test_model_provider.py
 Component:         Unit tests — Test Model Provider
 Purpose:           Unit tests for the deterministic model provider.
 Interacts With:    One isolated source responsibility
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Fast feedback, failure paths, state invariants
 Tools:             Python 3.12, pytest
 """

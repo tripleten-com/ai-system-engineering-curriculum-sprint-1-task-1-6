@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/worker/metrics.py
 Component:         Worker — Metrics
 Purpose:           Define bounded Prometheus metrics for exception processing.
 Interacts With:    Redis Streams, domain, ports, and adapters
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Background processing, retries, idempotency
 Tools:             Python 3.12, Prometheus
 """

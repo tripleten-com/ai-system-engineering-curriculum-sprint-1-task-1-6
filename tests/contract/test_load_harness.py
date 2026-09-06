@@ -1,4 +1,4 @@
-"""Coldline — Task 1.4.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/test_load_harness.py
 Component:         Contract — Load harness
 Purpose:           Grade the Task 1.4 latency-injection assignment.
 Interacts With:    loadtest/model_provider_latency.py
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.4
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Controlled experiments
 Tools:             Python 3.12, pytest
 """

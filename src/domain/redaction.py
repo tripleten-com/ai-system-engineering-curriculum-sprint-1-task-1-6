@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/domain/redaction.py
 Component:         Domain — Redaction
 Purpose:           Provide supplied redaction for bounded synthetic text fields.
 Interacts With:    API and worker use cases
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Business rules, immutable contracts, state
 Tools:             Python 3.12
 """

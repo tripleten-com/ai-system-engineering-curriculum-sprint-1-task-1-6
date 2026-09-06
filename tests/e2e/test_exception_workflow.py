@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/e2e/test_exception_workflow.py
 Component:         End-to-end tests — Exception workflow
 Purpose:           Proves the external API-to-worker behavior and durable duplicate identity.
 Interacts With:    API, worker, PostgreSQL, Redis Streams, and Jaeger
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Asynchronous completion, idempotency, observable evidence
 Tools:             Python 3.12, pytest, httpx
 """

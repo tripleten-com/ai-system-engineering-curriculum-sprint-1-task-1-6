@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              infra/scripts/bootstrap.py
 Component:         Developer tooling — Bootstrap
 Purpose:           Install the pinned uv bootstrap binary after verifying its release hash.
 Interacts With:    Local workstation, uv, and Docker Compose
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Reproducibility, preflight checks, bootstrap
 Tools:             Python 3.12
 """
@@ -27,6 +27,14 @@ from pathlib import Path
 
 UV_VERSION = "0.11.8"
 ARTIFACTS = {
+    ("Darwin", "arm64"): (
+        "uv-aarch64-apple-darwin.tar.gz",
+        "c729adb365114e844dd7f9316313a7ed6443b89bb5681d409eebac78b0bd06c8",
+    ),
+    ("Darwin", "x86_64"): (
+        "uv-x86_64-apple-darwin.tar.gz",
+        "c59d73bf34b58bc8e33a11629f7a255c11789fd00f03cd3e68ab2d1603645de9",
+    ),
     ("Windows", "AMD64"): (
         "uv-x86_64-pc-windows-msvc.zip",
         "c84629a56e0706b69a47ea35862208af827cb6fbfa1d0ca763c52c67594637e8",
@@ -43,7 +51,7 @@ ARTIFACTS = {
 
 
 def main() -> int:
-    """Download, authenticate, and install uv and uvx inside this snapshot."""
+    """Download, authenticate, and install uv and uvx inside this repository."""
     key = (platform.system(), platform.machine())
     if key not in ARTIFACTS:
         raise SystemExit(f"unsupported bootstrap platform: {key[0]} {key[1]}")

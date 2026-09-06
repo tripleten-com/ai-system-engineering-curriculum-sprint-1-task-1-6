@@ -1,9 +1,9 @@
-# Coldline - Task 1.1
+# Coldline
 # File: .dockerignore
 # Component: Container build input
-# Purpose: Keep local caches and authoring noise out of image layers.
+# Purpose: Keep local caches and build artifacts out of image layers.
 # Interacts With: Docker build contexts
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.1
+# Sprint/Task: Sprint 1 — Project 1
 # Concepts: Small and safe image inputs
 # Tools: Docker
 

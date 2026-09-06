@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/adapters/telemetry.py
 Component:         Adapter — Telemetry
 Purpose:           Configure OpenTelemetry export for supplied runtime adapters.
 Interacts With:    Domain contracts, ports, and local providers
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Boundary translation, deterministic infrastructure
 Tools:             Python 3.12, OpenTelemetry
 """

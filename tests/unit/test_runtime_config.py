@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/unit/test_runtime_config.py
 Component:         Unit tests — Runtime host configuration
 Purpose:           Keep Compose and verification host-port overrides aligned.
 Interacts With:    Process environment, local .env, runtime test helpers
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Local parity, explicit precedence, deterministic configuration
 Tools:             Python 3.12, pytest
 """

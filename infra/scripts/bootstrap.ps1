@@ -1,9 +1,9 @@
-# Coldline - Task 1.1
+# Coldline
 # File: infra/scripts/bootstrap.ps1
 # Component: Windows bootstrap wrapper
 # Purpose: Run the shared Python bootstrap from PowerShell.
 # Interacts With: infra/scripts/bootstrap.py
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.1
+# Sprint/Task: Sprint 1 — Project 1
 # Concepts: Cross-platform setup
 # Tools: PowerShell, Python 3.12
 

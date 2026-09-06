@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/unit/adapters/test_redis_job_queue.py
 Component:         Unit tests — Test Redis Job Queue
 Purpose:           Unit tests for Redis Streams job serialization.
 Interacts With:    One isolated source responsibility
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Fast feedback, failure paths, state invariants
 Tools:             Python 3.12, pytest
 """

@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/ports/object_store.py
 Component:         Port — Object Store
 Purpose:           Define the provider-neutral object-storage port.
 Interacts With:    Use cases and provider adapters
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Dependency inversion, provider-neutral interface
 Tools:             Python 3.12
 """

@@ -1,4 +1,4 @@
-"""Coldline — Task 1.6.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/test_submission.py
 Component:         Contract tests — Test Submission
 Purpose:           Tests for the public answer and path checks for this Task's submission.
 Interacts With:    Published interfaces and repository boundaries
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.6
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Compatibility, ownership, export safety
 Tools:             Python 3.12, pytest
 """
@@ -18,6 +18,7 @@ import yaml
 
 from tests.contract.submission_validation import (
     SubmissionError,
+    _load_one_document,
     main,
     validate_baseline,
     validate_changed_paths,
@@ -79,7 +80,7 @@ def test_malformed_yaml_is_rejected(tmp_path: Path) -> None:
     submission = tmp_path / "submission.yaml"
     submission.write_text("answers: [unterminated", encoding="utf-8")
 
-    with pytest.raises(SubmissionError, match="valid YAML"):
+    with pytest.raises(SubmissionError, match="restricted YAML"):
         validate_submission(submission, ROOT / "docs/contracts/submission.schema.json")
 
 
@@ -165,3 +166,64 @@ def test_public_entrypoint_reports_an_incomplete_answer_sheet(
 
     assert main(tmp_path, changed_paths=[]) == 1
     assert "answers.decision_evidence_mappings is incomplete" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "unsafe_text",
+    [
+        "answers: {value: first, value: second}\n",
+        "answers: &answer {value: fictional}\n",
+        "answers: *missing\n",
+        "answers: {<<: {value: fictional}}\n",
+        "answers: {value: 2026-09-04}\n",
+        "answers: {value: 2026-09-04T12:30:00Z}\n",
+        "answers: {value: !custom fictional}\n",
+        "answers: {value: !!set {fictional: null}}\n",
+        "answers: {1: fictional}\n",
+    ],
+    ids=[
+        "duplicate-key",
+        "anchor",
+        "alias",
+        "merge-key",
+        "date",
+        "timestamp",
+        "custom-tag",
+        "set",
+        "non-string-key",
+    ],
+)
+def test_non_json_yaml_constructs_are_rejected(tmp_path: Path, unsafe_text: str) -> None:
+    """Reject restricted syntax before schema validation can mask a parser defect."""
+    submission = tmp_path / "submission.yaml"
+    submission.write_text(unsafe_text, encoding="utf-8")
+
+    with pytest.raises(SubmissionError, match="restricted YAML"):
+        _load_one_document(submission)
+
+
+def test_multiple_yaml_documents_are_rejected(tmp_path: Path) -> None:
+    """A second document cannot supply or replace the answer mapping."""
+    submission = tmp_path / "submission.yaml"
+    submission.write_text("answers: {}\n---\nanswers: {}\n", encoding="utf-8")
+
+    with pytest.raises(SubmissionError, match="exactly one YAML mapping"):
+        _load_one_document(submission)
+
+
+def test_plain_yaml_values_and_block_strings_are_preserved(tmp_path: Path) -> None:
+    """The restrictions preserve ordinary answer data and quoted date strings."""
+    submission = tmp_path / "submission.yaml"
+    submission.write_text(
+        'answers:\n  date: "2026-09-04"\n  values: [true, false, null, 12, 2.5]\n'
+        "  explanation: |\n    Fictional observation.\n    Second line.\n",
+        encoding="utf-8",
+    )
+
+    assert _load_one_document(submission) == {
+        "answers": {
+            "date": "2026-09-04",
+            "values": [True, False, None, 12, 2.5],
+            "explanation": "Fictional observation.\nSecond line.\n",
+        }
+    }

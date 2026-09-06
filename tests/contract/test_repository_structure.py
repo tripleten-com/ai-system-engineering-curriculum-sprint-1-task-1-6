@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,8 +6,8 @@ File:              tests/contract/test_repository_structure.py
 Component:         Repository structure contract
 Purpose:           Keeps the student-visible tree small and predictable.
 Interacts With:    Task root, src packages, docs, infrastructure, and tests
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
-Concepts:          Navigability, package ownership, authoring safety
+Sprint/Task:       Sprint 1 — Project 1
+Concepts:          Navigability, package ownership, repository integrity
 Tools:             Python 3.12, pytest
 """
 
@@ -50,7 +50,7 @@ def test_source_tree_exposes_exactly_five_flat_packages() -> None:
 
 
 def _tracked_task_paths() -> set[PurePosixPath]:
-    """Return Task-relative paths while working here or after history-free export."""
+    """Return Task-relative paths in the Task repository."""
     repository = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         cwd=TASK_ROOT,
@@ -59,8 +59,8 @@ def _tracked_task_paths() -> set[PurePosixPath]:
         text=True,
     )
     if repository.returncode != 0:
-        # Published templates have no authoring history. Inspect their materialized
-        # files while ignoring only local tool output created after installation.
+        # When Git metadata is unavailable, inspect materialized files while
+        # ignoring only local tool output created after installation.
         return {
             PurePosixPath(path.relative_to(TASK_ROOT).as_posix())
             for path in TASK_ROOT.rglob("*")

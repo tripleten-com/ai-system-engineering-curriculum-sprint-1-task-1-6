@@ -1,12 +1,12 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
 File:              infra/scripts/preflight.py
 Component:         Developer tooling — Preflight
-Purpose:           Check the Task 1.1 local toolchain without changing the environment.
+Purpose:           Check the local toolchain without changing the environment.
 Interacts With:    Local workstation, uv, and Docker Compose
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Reproducibility, preflight checks, bootstrap
 Tools:             Python 3.12
 """

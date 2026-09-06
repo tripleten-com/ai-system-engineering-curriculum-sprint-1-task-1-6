@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/test_api_contract.py
 Component:         Contract tests — Test Api Contract
 Purpose:           HTTP contract tests for the Coldline API.
 Interacts With:    Published interfaces and repository boundaries
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Compatibility, ownership, export safety
 Tools:             Python 3.12, pytest
 """

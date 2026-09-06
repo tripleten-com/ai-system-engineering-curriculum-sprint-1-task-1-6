@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/runtime_config.py
 Component:         Runtime verification configuration
 Purpose:           Read host-port overrides with Docker Compose-compatible precedence.
 Interacts With:    Process environment, local .env, smoke and E2E checks
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Local parity, explicit precedence, bounded configuration
 Tools:             Python 3.12
 """

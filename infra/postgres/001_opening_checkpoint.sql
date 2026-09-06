@@ -1,9 +1,9 @@
--- Coldline - Task 1.1
+-- Coldline
 -- File: infra/postgres/001_opening_checkpoint.sql
 -- Component: Database initialization
 -- Purpose: Create the durable exception table and state constraints.
 -- Interacts With: PostgreSQL initializer and domain state contract
--- Sprint/Task: Sprint 1 - Project 1 / Task 1.1
+-- Sprint/Task: Sprint 1 — Project 1
 -- Concepts: Idempotent schema setup
 -- Tools: PostgreSQL SQL
 

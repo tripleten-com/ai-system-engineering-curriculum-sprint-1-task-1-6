@@ -1,9 +1,9 @@
-# Coldline - Task 1.1
+# Coldline
 # File: infra/observability/prometheus.yml
 # Component: Prometheus scrape configuration
 # Purpose: Collect bounded API and worker metrics from the local network.
 # Interacts With: API and worker metric endpoints
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.1
+# Sprint/Task: Sprint 1 — Project 1
 # Concepts: Metrics collection
 # Tools: Prometheus
 

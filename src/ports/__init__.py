@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/ports/__init__.py
 Component:         Ports — Package exports
 Purpose:           Re-export the five accepted provider-neutral application ports.
 Interacts With:    Use cases and provider adapters
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Dependency inversion, provider-neutral interface
 Tools:             Python 3.12
 """
