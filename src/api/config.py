@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/api/config.py
 Component:         API — Config
 Purpose:           Own and validate every API environment read.
 Interacts With:    FastAPI, domain, ports, and adapters
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          HTTP boundary, composition, asynchronous work
 Tools:             Python 3.12, Redis, Pydantic
 """

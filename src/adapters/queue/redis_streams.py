@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/adapters/queue/redis_streams.py
 Component:         Adapter — Redis Streams
 Purpose:           Implement the supplied Redis Streams JobQueue adapter.
 Interacts With:    Domain contracts, ports, and local providers
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Boundary translation, deterministic infrastructure
 Tools:             Python 3.12, Redis, OpenTelemetry
 """

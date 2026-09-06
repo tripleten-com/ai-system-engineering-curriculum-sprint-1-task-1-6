@@ -1,9 +1,9 @@
-# Coldline - Task 1.1
+# Coldline - Task 1.6
 # File: compose.yaml
 # Component: Local runtime topology
-# Purpose: Run the complete Task 1.1 platform with one command.
+# Purpose: Run the complete Task 1.6 platform with one command.
 # Interacts With: API, worker, PostgreSQL, Redis, Jaeger, Prometheus, Grafana
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.1
+# Sprint/Task: Sprint 1 - Project 1 / Task 1.6
 # Concepts: Service orchestration and readiness
 # Tools: Docker Compose
 
@@ -105,7 +105,7 @@ services:
   jaeger:
     profiles: ["observability"]
     image: jaegertracing/all-in-one:1.76.0@sha256:ab6f1a1f0fb49ea08bcd19f6b84f6081d0d44b364b6de148e1798eb5816bacac
-    user: "0:0" # Badger must initialize its curriculum-owned named volume.
+    user: "0:0" # Badger must initialize its named volume.
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
       SPAN_STORAGE_TYPE: badger

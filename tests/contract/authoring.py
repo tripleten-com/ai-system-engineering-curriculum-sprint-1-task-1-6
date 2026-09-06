@@ -1,13 +1,13 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
 File:              tests/contract/authoring.py
-Component:         Authoring and export verifier
-Purpose:           Checks repository boundaries that student tests must not own.
+Component:         Repository integrity verifier
+Purpose:           Checks required Task repository structure and configuration.
 Interacts With:    Source packages, Compose, Codespaces, schemas, and uv.lock
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
-Concepts:          Dependency direction, identity parity, export hygiene
+Sprint/Task:       Sprint 1 — Project 1
+Concepts:          Dependency direction, identity parity, repository integrity
 Tools:             Python 3.12, AST, uv, Docker Compose YAML
 """
 
@@ -49,16 +49,16 @@ IGNORED_PARTS = {
 
 
 def main() -> int:
-    """Run every author-owned check and report all failures together.
+    """Run every repository check and report all failures together.
 
-    Returning every failure in one run keeps review cycles short. The student
-    verifier stays smaller and checks only the published Task contract.
+    Returning every failure in one run keeps review cycles short. Public
+    verification stays smaller and checks only the Task contract.
     """
-    files = _authored_files()
+    files = _repository_files()
     failures: list[str] = []
     failures.extend(_check_layout())
     failures.extend(_check_placeholders(files))
-    failures.extend(_check_publication_tokens(files))
+    failures.extend(_check_unresolved_template_tokens(files))
     failures.extend(_check_nested_git())
     failures.extend(_check_ports())
     failures.extend(_check_compose())
@@ -73,15 +73,15 @@ def main() -> int:
     failures.extend(_check_secrets(files))
     failures.extend(_check_lock())
     if failures:
-        print("Author verification failed:", file=sys.stderr)
+        print("Repository verification failed:", file=sys.stderr)
         for failure in failures:
             print(f"- {failure}", file=sys.stderr)
         return 1
-    print("Author verification passed: structure, boundaries, pins, and export hygiene are valid.")
+    print("Repository verification passed: structure, boundaries, and pins are valid.")
     return 0
 
 
-def _authored_files() -> list[Path]:
+def _repository_files() -> list[Path]:
     """Return source-controlled candidates while ignoring local tool output."""
     return [
         path
@@ -97,12 +97,12 @@ def _check_layout() -> list[str]:
     visible = {
         path.name
         for path in ROOT.iterdir()
-        if path.is_dir() and not path.name.startswith(".") and _contains_authored_file(path)
+        if path.is_dir() and not path.name.startswith(".") and _contains_repository_file(path)
     }
     source_packages = {
         path.name
         for path in (ROOT / "src").iterdir()
-        if path.is_dir() and _contains_authored_file(path)
+        if path.is_dir() and _contains_repository_file(path)
     }
     failures: list[str] = []
     if visible != EXPECTED_CONTENT_DIRECTORIES:
@@ -118,7 +118,7 @@ def _check_layout() -> list[str]:
     return failures
 
 
-def _contains_authored_file(directory: Path) -> bool:
+def _contains_repository_file(directory: Path) -> bool:
     """Ignore empty folders and stale Python caches left by local execution."""
     return any(
         path.is_file()
@@ -137,14 +137,14 @@ def _check_placeholders(files: list[Path]) -> list[str]:
         if path.name == ".gitkeep":
             failures.append(f"placeholder remains: {relative}")
         if "localstack" in lowered:
-            failures.append(f"LocalStack path is forbidden in Task 1.1: {relative}")
+            failures.append(f"LocalStack path is forbidden in this Sprint: {relative}")
         if any(part in lowered for part in ("solution", "held-out", "evaluator", "instructor")):
             failures.append(f"restricted-looking path is forbidden: {relative}")
     return failures
 
 
-def _check_publication_tokens(files: list[Path]) -> list[str]:
-    """Allow only the one CMS-owned URL token that publication must replace."""
+def _check_unresolved_template_tokens(files: list[Path]) -> list[str]:
+    """Reject unresolved template tokens in the released repository."""
     found: set[tuple[str, str]] = set()
     for path in files:
         try:
@@ -153,16 +153,11 @@ def _check_publication_tokens(files: list[Path]) -> list[str]:
             continue
         relative = path.relative_to(ROOT).as_posix()
         found.update((relative, token) for token in re.findall(r"(?<!\$)\{\{[^{}]+\}\}", text))
-    # Build the marker in parts so this checker does not match its own source.
-    export_token = (chr(123) * 2) + "CODESPACES_URL" + (chr(125) * 2)
-    expected = {("README.md", export_token)}
-    if found != expected:
-        return [f"publication token allowlist mismatch: {sorted(found)}"]
-    return []
+    return [f"unresolved template tokens: {sorted(found)}"] if found else []
 
 
 def _check_nested_git() -> list[str]:
-    """Reject nested repository metadata inside the future export root."""
+    """Reject nested repository metadata inside the Task root."""
     nested = [path for path in ROOT.rglob(".git") if path.parent.resolve() != ROOT.resolve()]
     return [f"nested Git metadata is forbidden: {path.relative_to(ROOT)}" for path in nested]
 
@@ -372,7 +367,7 @@ def _check_bootstrap_target() -> list[str]:
 
 
 def _check_markdown_links(files: list[Path]) -> list[str]:
-    """Resolve local Markdown links before a history-free export removes context."""
+    """Resolve local Markdown links within the Task repository."""
     failures: list[str] = []
     pattern = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
     for path in files:

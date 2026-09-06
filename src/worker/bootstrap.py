@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/worker/bootstrap.py
 Component:         Worker — Bootstrap
 Purpose:           Compose and run the Redis-backed Coldline worker.
 Interacts With:    Redis Streams, domain, ports, and adapters
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Background processing, retries, idempotency
 Tools:             Python 3.12, PostgreSQL, Redis, OpenTelemetry, Prometheus
 """

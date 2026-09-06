@@ -1,12 +1,12 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
 File:              tests/e2e/scenario.py
 Component:         End-to-end tests — Scenario
-Purpose:           Run the published Task 1.1 baseline exception scenario.
+Purpose:           Run the supplied baseline exception scenario.
 Interacts With:    External API, worker, storage, and telemetry
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Black-box workflow, durable identity, evidence
 Tools:             Python 3.12, pytest
 """
@@ -14,7 +14,7 @@ Tools:             Python 3.12, pytest
 import json
 import time
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 from urllib.parse import quote
 
 import httpx
@@ -36,16 +36,16 @@ def main() -> int:
         accepted_body = accepted.json()
         record = _wait_for_completion(client, accepted_body["status_url"])
         exception_id = cast(str, record["exception_id"])
-        api_trace_ids = _wait_for_traces(client, "coldline-api", exception_id)
-        worker_trace_ids = _wait_for_traces(client, "coldline-worker", exception_id)
+        api_trace_id = _wait_for_traces(client, "coldline-api", exception_id)
+        worker_trace_id = _wait_for_traces(client, "coldline-worker", exception_id)
     print(
         json.dumps(
             {
                 "scenario_id": fixture["scenario_id"],
                 "exception_id": record["exception_id"],
                 "state": record["state"],
-                "api_trace_ids": api_trace_ids,
-                "worker_trace_ids": worker_trace_ids,
+                "api_trace_id": api_trace_id,
+                "worker_trace_id": worker_trace_id,
                 "status_url": accepted_body["status_url"],
                 "jaeger_url": (f"http://localhost:{host_port('COLDLINE_JAEGER_HOST_PORT', 16686)}"),
                 "grafana_url": (
@@ -74,19 +74,30 @@ def _wait_for_completion(client: httpx.Client, status_url: str) -> dict[str, obj
     raise RuntimeError("published scenario did not complete within 15 seconds")
 
 
-def _wait_for_traces(client: httpx.Client, service: str, exception_id: str) -> list[str]:
-    """Return trace identities correlated to one exception when exported."""
+def _wait_for_traces(client: httpx.Client, service: str, exception_id: str) -> str:
+    """Return the most recent trace identity correlated to one exception when exported."""
     tags = quote(json.dumps({"coldline.exception_id": exception_id}, separators=(",", ":")))
     jaeger_port = host_port("COLDLINE_JAEGER_HOST_PORT", 16686)
     endpoint = f"http://localhost:{jaeger_port}/api/traces?service={service}&tags={tags}"
     for _ in range(20):
         response = client.get(endpoint)
         response.raise_for_status()
-        trace_ids = sorted(
-            {trace_data["traceID"] for trace_data in response.json().get("data", [])}
-        )
-        if trace_ids:
-            return trace_ids
+        traces = cast(list[dict[str, Any]], response.json().get("data", []))
+        candidates: list[tuple[int, str]] = []
+        for trace in traces:
+            trace_id = trace.get("traceID")
+            spans = trace.get("spans")
+            if not isinstance(trace_id, str) or not isinstance(spans, list):
+                continue
+            start_times = [
+                start_time
+                for span in spans
+                if isinstance(span, dict)
+                if isinstance(start_time := span.get("startTime"), int)
+            ]
+            candidates.append((max(start_times, default=0), trace_id))
+        if candidates:
+            return max(candidates)[1]
         time.sleep(0.5)
     raise RuntimeError(f"no {service} trace was exported for exception {exception_id}")
 

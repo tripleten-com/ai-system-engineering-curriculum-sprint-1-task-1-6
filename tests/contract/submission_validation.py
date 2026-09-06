@@ -1,4 +1,4 @@
-"""Coldline — Task 1.6.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/submission_validation.py
 Component:         Contract tests — Submission Validation
 Purpose:           Validate this Task's submission answers and advisory change paths.
 Interacts With:    Published interfaces and repository boundaries
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.6
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Compatibility, ownership, export safety
 Tools:             Python 3.12, pytest
 """
@@ -35,6 +35,81 @@ BASELINE_MARKERS = frozenset(
         '| e.g. "Worker concurrency is the primary bottleneck"',
     }
 )
+
+
+_JSON_YAML_TAGS = frozenset(
+    {
+        "tag:yaml.org,2002:map",
+        "tag:yaml.org,2002:seq",
+        "tag:yaml.org,2002:str",
+        "tag:yaml.org,2002:null",
+        "tag:yaml.org,2002:bool",
+        "tag:yaml.org,2002:int",
+        "tag:yaml.org,2002:float",
+    }
+)
+
+
+class _RestrictedYamlLoader(yaml.SafeLoader):  # type: ignore[misc]
+    """Load the Task's small YAML profile without YAML-only conveniences."""
+
+    def compose_node(self, parent: object, index: object) -> yaml.Node:
+        # A prior anchor is already rejected below, but deny aliases directly too.
+        if self.check_event(yaml.AliasEvent):
+            event = self.get_event()
+            raise yaml.composer.ComposerError(
+                None,
+                None,
+                "YAML aliases are not permitted",
+                event.start_mark,
+            )
+        event = self.peek_event()
+        if getattr(event, "anchor", None) is not None:
+            raise yaml.composer.ComposerError(
+                None,
+                None,
+                "YAML anchors are not permitted",
+                event.start_mark,
+            )
+        return super().compose_node(parent, index)
+
+    def construct_object(self, node: yaml.Node, deep: bool = False) -> object:
+        if node.tag not in _JSON_YAML_TAGS:
+            raise yaml.constructor.ConstructorError(
+                None,
+                None,
+                "non-JSON YAML tags are not permitted",
+                node.start_mark,
+            )
+        return super().construct_object(node, deep=deep)
+
+    def construct_mapping(self, node: yaml.MappingNode, deep: bool = False) -> dict[str, object]:
+        mapping: dict[str, object] = {}
+        for key_node, value_node in node.value:
+            if key_node.tag == "tag:yaml.org,2002:merge":
+                raise yaml.constructor.ConstructorError(
+                    None,
+                    None,
+                    "YAML merge keys are not permitted",
+                    key_node.start_mark,
+                )
+            key = self.construct_object(key_node, deep=deep)
+            if not isinstance(key, str):
+                raise yaml.constructor.ConstructorError(
+                    None,
+                    None,
+                    "YAML mapping keys must be strings",
+                    key_node.start_mark,
+                )
+            if key in mapping:
+                raise yaml.constructor.ConstructorError(
+                    None,
+                    None,
+                    f"duplicate YAML key: {key}",
+                    key_node.start_mark,
+                )
+            mapping[key] = self.construct_object(value_node, deep=deep)
+        return mapping
 
 
 class SubmissionError(ValueError):
@@ -112,7 +187,7 @@ def validate_changed_paths(paths: list[str]) -> None:
 
 
 def _changed_paths(root: Path) -> list[str]:
-    """Return changes since this checkout's published baseline commit."""
+    """Return changes since the commit this checkout branched from."""
     try:
         repository_root = Path(
             subprocess.run(
@@ -143,12 +218,12 @@ def _changed_paths(root: Path) -> list[str]:
 def _baseline_commit(repository_root: Path) -> str:
     """Return the commit a student's changes are measured against.
 
-    Student work happens ahead of the repository's published `main` - on a
-    branch, or as uncommitted edits - and later export refreshes legitimately
-    keep advancing `main` after a student has already forked from it. The
-    protected boundary is therefore the commit a student actually started
-    from (their merge-base with `main`), not the repository's very first
-    commit, which an export refresh may since have moved past.
+    Student work happens ahead of `main` - on a branch, or as uncommitted
+    edits - and `main` itself keeps moving as this repository receives
+    updates after a student has already forked from it. The protected
+    boundary is therefore the commit a student actually started from
+    (their merge-base with `main`), not the repository's very first
+    commit, which a later update may have moved past.
     """
     for candidate in ("origin/main", "main"):
         probe = subprocess.run(
@@ -166,8 +241,8 @@ def _baseline_commit(repository_root: Path) -> str:
                 text=True,
             )
             return merge_base.stdout.strip()
-    # No published `main` is reachable (e.g. an unpublished staging export) -
-    # fall back to the repository's single root commit.
+    # No `main` branch is reachable - fall back to the repository's single
+    # root commit.
     roots = subprocess.run(
         ["git", "rev-list", "--max-parents=0", "HEAD"],
         cwd=repository_root,
@@ -181,11 +256,13 @@ def _baseline_commit(repository_root: Path) -> str:
 
 
 def _load_one_document(path: Path) -> dict[str, Any]:
-    """Load exactly one safe YAML mapping."""
+    """Load exactly one plain JSON-compatible YAML mapping."""
     try:
-        documents = list(yaml.safe_load_all(path.read_text(encoding="utf-8")))
+        documents = list(
+            yaml.load_all(path.read_text(encoding="utf-8"), Loader=_RestrictedYamlLoader)
+        )
     except yaml.YAMLError as exc:
-        raise SubmissionError(f"{path.name} must contain valid YAML") from exc
+        raise SubmissionError(f"{path.name} must contain restricted YAML") from exc
     if len(documents) != 1 or not isinstance(documents[0], dict):
         raise SubmissionError(f"{path.name} must contain exactly one YAML mapping")
     return documents[0]

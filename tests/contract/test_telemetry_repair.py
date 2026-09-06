@@ -1,4 +1,4 @@
-"""Coldline — Task 1.3.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/test_telemetry_repair.py
 Component:         Contract — Telemetry repair
 Purpose:           Grade the Task 1.3 trace-propagation and metric fixes.
 Interacts With:    Redis Streams adapter, worker metrics, live runtime stack
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.3
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Distributed tracing, metric cardinality, contract testing
 Tools:             Python 3.12, pytest, OpenTelemetry, Prometheus, Docker Compose
 

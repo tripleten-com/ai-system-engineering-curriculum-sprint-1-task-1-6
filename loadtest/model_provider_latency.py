@@ -1,4 +1,4 @@
-"""Coldline — Task 1.4.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              loadtest/model_provider_latency.py
 Component:         Load test — Provider latency injection
 Purpose:           The ONLY file you may edit for Task 1.4. Wire in the injected delay.
 Interacts With:    The running worker's COLDLINE_MODEL_LATENCY_MS setting
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.4
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Controlled experiments, one independent variable
 Tools:             Python 3.12, Docker Compose
 """

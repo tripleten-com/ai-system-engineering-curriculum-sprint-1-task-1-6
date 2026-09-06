@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/domain/repositories.py
 Component:         Domain — Repositories
 Purpose:           Define internal persistence collaborators outside the five application ports.
 Interacts With:    API and worker use cases
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Business rules, immutable contracts, state
 Tools:             Python 3.12
 """

@@ -1,13 +1,13 @@
-"""Coldline — Task 1.2.
+"""Coldline.
 
 ===================
 
 File:              tests/contract/test_authoring_contract.py
-Component:         Authoring verifier contract
-Purpose:           Runs the same structural gate used before export.
-Interacts With:    tests.contract.authoring and the complete Task tree
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.2
-Concepts:          Dependency direction, configuration ownership, export hygiene
+Component:         Repository integrity contract
+Purpose:           Verifies required Task repository structure and configuration.
+Interacts With:    Repository integrity checks and the complete Task tree
+Sprint/Task:       Sprint 1 — Project 1
+Concepts:          Dependency direction, configuration ownership, repository integrity
 Tools:             Python 3.12, pytest
 """
 
@@ -18,7 +18,7 @@ from tests.contract import authoring
 from tests.contract.submission_validation import _changed_paths
 
 TASK_ROOT = Path(__file__).resolve().parents[2]
-BANNER_PATTERN = re.compile(r"Coldline — Task \d+\.\d+")
+BANNER_PATTERN = re.compile(r"Coldline(?: — Task \d+\.\d+)?\.")
 # Task 1.6's own boundary: a submitted PR may touch only the answer sheet and the decision-evidence
 # record. Keep this in sync with submission_validation.ALLOWED_PATHS.
 SUBMISSION_DIFF_ALLOWLIST = frozenset(
@@ -58,7 +58,7 @@ COMMENTABLE_CONFIGURATION = (
 )
 
 
-def test_current_snapshot_satisfies_the_authoring_contract() -> None:
+def test_current_repository_satisfies_the_integrity_contract() -> None:
     """Fail when a protected repository invariant drifts."""
     assert authoring.main() == 0
 
@@ -75,7 +75,7 @@ def test_python_files_have_the_student_navigation_banner() -> None:
             header = text[:1200]
             missing = [field for field in HEADER_FIELDS if field not in header]
             if not BANNER_PATTERN.search(header):
-                missing.insert(0, "Coldline — Task <sprint>.<task>")
+                missing.insert(0, "Coldline navigation banner")
             if missing:
                 failures.append(f"{path.relative_to(TASK_ROOT)}: {', '.join(missing)}")
 
@@ -90,7 +90,7 @@ def test_submission_change_stays_within_the_permitted_diff() -> None:
 
 def test_commentable_configuration_files_explain_their_role() -> None:
     """Catch operational files that provide configuration without context."""
-    banner = re.compile(r"Coldline - Task \d+\.\d+")
+    banner = re.compile(r"(?m)^(?:#|--) Coldline(?: - Task \d+\.\d+)?$")
     missing = []
     for relative in COMMENTABLE_CONFIGURATION:
         text = (TASK_ROOT / relative).read_text(encoding="utf-8")
@@ -98,3 +98,8 @@ def test_commentable_configuration_files_explain_their_role() -> None:
             missing.append(relative)
 
     assert missing == []
+
+
+def test_released_repository_has_no_unresolved_template_tokens() -> None:
+    """A student-facing README must not contain an unresolved placeholder."""
+    assert authoring._check_unresolved_template_tokens([TASK_ROOT / "README.md"]) == []

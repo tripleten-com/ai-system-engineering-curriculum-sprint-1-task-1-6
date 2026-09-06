@@ -1,4 +1,4 @@
-"""Coldline — Task 1.4.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              loadtest/locustfile.py
 Component:         Load test — Locust user
 Purpose:           Generate the pinned traffic profile against the Coldline API.
 Interacts With:    The running Coldline API
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.4
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Controlled load experiments
 Tools:             Python 3.12, Locust
 """

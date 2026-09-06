@@ -22,7 +22,9 @@ ports already used by another project during this authoring run.
 
 ## Boundary of this evidence
 
-- Host: Windows Docker Desktop with local base images available.
+- Host: Windows Docker Desktop with local base images available. The bootstrap now resolves macOS
+  arm64/x86-64, but no macOS or Linux run contributed to these timings or image sizes; Apple Silicon
+  builds the same multi-architecture images for `linux/arm64` and is not covered by this evidence.
 - The no-cache build rebuilt application layers; it did not prove a cold network pull.
 - Memory is one post-readiness sample, not a measured peak.
 - Storage and build-cache peaks are not yet recorded.

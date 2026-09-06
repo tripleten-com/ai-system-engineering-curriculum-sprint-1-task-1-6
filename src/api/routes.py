@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/api/routes.py
 Component:         API — Routes
 Purpose:           Expose the Coldline exception application through FastAPI.
 Interacts With:    FastAPI, domain, ports, and adapters
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          HTTP boundary, composition, asynchronous work
 Tools:             Python 3.12, FastAPI, OpenTelemetry, Prometheus, Pydantic
 """

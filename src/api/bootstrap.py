@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/api/bootstrap.py
 Component:         API — Bootstrap
 Purpose:           Compose and run the Coldline API service.
 Interacts With:    FastAPI, domain, ports, and adapters
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          HTTP boundary, composition, asynchronous work
 Tools:             Python 3.12, FastAPI, PostgreSQL, Redis, OpenTelemetry
 """

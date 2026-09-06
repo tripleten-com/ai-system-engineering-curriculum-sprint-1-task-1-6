@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.8@sha256:e87caa74dcb7d46cd820352bfea12591f3dba3ddc4285e19c7dcd13359f7cefd
-# Coldline - Task 1.1
+# Coldline
 # File: infra/containers/api.Dockerfile
 # Component: API container image
 # Purpose: Build and run the API as an unprivileged user.
 # Interacts With: Root Python project and api package
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.1
+# Sprint/Task: Sprint 1 — Project 1
 # Concepts: Reproducible container builds
 # Tools: Docker, uv, Python 3.12
 

@@ -1,12 +1,12 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
 File:              tests/smoke/readiness.py
 Component:         Smoke tests — Readiness
-Purpose:           Check the documented ready state for every Task 1.1 runtime surface.
+Purpose:           Check the documented ready state for every runtime surface.
 Interacts With:    Running Docker Compose services
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Readiness, provisioning, bounded diagnostics
 Tools:             Python 3.12, pytest, Prometheus
 """

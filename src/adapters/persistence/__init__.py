@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              src/adapters/persistence/__init__.py
 Component:         Persistence adapters — Package exports
 Purpose:           Expose internal persistence adapters.
 Interacts With:    Domain contracts, ports, and local providers
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Boundary translation, deterministic infrastructure
 Tools:             Python 3.12
 """

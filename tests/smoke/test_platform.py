@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/smoke/test_platform.py
 Component:         Smoke tests — Local platform
 Purpose:           Confirms that every supplied service initialized and can be inspected.
 Interacts With:    Docker Compose, API, PostgreSQL, Redis, Grafana, Prometheus, Jaeger
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Readiness, deterministic provisioning, bounded diagnostics
 Tools:             Python 3.12, pytest, httpx, Docker Compose
 """

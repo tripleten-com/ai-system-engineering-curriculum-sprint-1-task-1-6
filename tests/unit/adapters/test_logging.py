@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/unit/adapters/test_logging.py
 Component:         Unit tests — Test Logging
 Purpose:           Unit tests for bounded structured logging.
 Interacts With:    One isolated source responsibility
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Fast feedback, failure paths, state invariants
 Tools:             Python 3.12, pytest
 """

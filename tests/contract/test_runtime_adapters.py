@@ -1,4 +1,4 @@
-"""Coldline — Task 1.1.
+"""Coldline.
 
 ===================
 
@@ -6,7 +6,7 @@ File:              tests/contract/test_runtime_adapters.py
 Component:         Contract tests — Runtime adapters
 Purpose:           Runs real PostgreSQL and Redis contracts inside the worker container.
 Interacts With:    Docker Compose, PostgreSQL, Redis, and worker image
-Sprint/Task:       Sprint 1 — Project 1 / Task 1.1
+Sprint/Task:       Sprint 1 — Project 1
 Concepts:          Initialization, idempotency, pending recovery, terminal failure
 Tools:             Python 3.12, pytest, Docker Compose
 """
