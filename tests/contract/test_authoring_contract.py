@@ -14,6 +14,8 @@ Tools:             Python 3.12, pytest
 import re
 from pathlib import Path
 
+import pytest
+
 from tests.contract import authoring
 from tests.contract.submission_validation import _changed_paths
 
@@ -82,6 +84,10 @@ def test_python_files_have_the_student_navigation_banner() -> None:
     assert failures == []
 
 
+# Scoped to a student submission: it asserts the diff from the merge base stays inside this
+# Task's student-editable boundary. A generated export PR necessarily changes more than that,
+# so template CI deselects this marker. Student CI and `poe author-verify` still run it.
+@pytest.mark.submission_boundary
 def test_submission_change_stays_within_the_permitted_diff() -> None:
     """Catch a submitted change that reaches outside Task 1.6's two-path submission boundary."""
     changed = set(_changed_paths(TASK_ROOT))

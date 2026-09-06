@@ -18,6 +18,12 @@ permissions:
 
 jobs:
   verify:
+    # This is the STUDENT contract: on a fresh opening checkpoint it is supposed to fail, and a
+    # student makes it pass. Export PRs regenerate the whole template, so running it there only
+    # produced permanent red that masked real regressions. template-integrity.yml covers those
+    # branches instead.
+    if: >-
+      !startsWith(github.head_ref, 'export/')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:

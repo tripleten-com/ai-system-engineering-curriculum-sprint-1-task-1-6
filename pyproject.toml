@@ -60,6 +60,7 @@ pythonpath = ["."]
 asyncio_mode = "auto"
 markers = [
   "runtime: requires the running Docker Compose stack",
+  "submission_boundary: asserts a student submission stays inside this Task's editable paths",
 ]
 
 [tool.ruff]
