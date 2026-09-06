@@ -1,0 +1,73 @@
+# Coldline
+# File: .github/workflows/template-integrity.yml
+# Component: Export-PR integrity CI
+# Purpose: Verify a generated export still builds, starts, and runs end to end.
+# Interacts With: uv, Poe, Docker Compose
+# Sprint/Task: Sprint 1 - Project 1
+# Concepts: Generated-artifact verification
+# Tools: GitHub Actions
+
+# Why this exists, separately from task.yml:
+#
+# task.yml runs `poe verify`, the STUDENT contract. A freshly exported opening checkpoint is
+# supposed to fail it — blank answer sheets, unrepaired telemetry, an uninjected latency harness.
+# That is the exercise. But export PRs are also pull requests, so every export PR was red too, and
+# a genuine export regression looked exactly like the normal red. Across the six Sprint 1
+# repositories that meant 34 workflow runs and 34 failures, with no run ever carrying signal.
+#
+# This workflow runs only on export branches and checks the half of the contract that MUST be
+# green on a fresh checkpoint regardless of Task: the repository lints and type-checks, the stack
+# builds and becomes ready, and the end-to-end path works. It deliberately never runs the exercise
+# gates (`answers`, `telemetry-repair`, `load-harness`, `capacity-answers`), so it ships no hint
+# about which checks a student is meant to repair.
+
+name: Template integrity
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    # Export branches only. On a student's PR this is the wrong contract — task.yml is the one
+    # that matters there — so skip rather than add a second, confusing check.
+    if: >-
+      startsWith(github.head_ref, 'export/')
+      || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the repository
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.12
+        # actions/setup-python v6.0.0
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: "3.12"
+      - name: Install pinned tooling
+        run: |
+          python infra/scripts/bootstrap.py
+          python infra/scripts/preflight.py
+          echo "$PWD/.tools/bin" >> "$GITHUB_PATH"
+          .tools/bin/uv sync --frozen
+      - name: Check the authoring profile
+        run: .tools/bin/uv run --frozen poe author-verify
+      - name: Start the pinned runtime
+        run: .tools/bin/uv run --frozen poe start
+      - name: Wait for readiness
+        run: .tools/bin/uv run --frozen poe ready
+      - name: Check the running platform
+        run: .tools/bin/uv run --frozen poe smoke
+      - name: Run the end-to-end workflow
+        run: .tools/bin/uv run --frozen poe e2e
+      - name: Run the scenario walkthrough
+        run: .tools/bin/uv run --frozen poe scenario
+      - name: Stop the runtime
+        if: always()
+        run: .tools/bin/uv run --frozen poe reset
