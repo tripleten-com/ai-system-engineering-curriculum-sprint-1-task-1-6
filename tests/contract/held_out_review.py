@@ -12,6 +12,7 @@ Tools:             Python 3.12, httpx
 """
 
 import json
+import math
 import os
 import sys
 import time
@@ -28,6 +29,23 @@ def run_held_out_check(scenario_json: str, api_base_url: str) -> bool:
     so a student reading CI output cannot recover the held-out answer key.
     """
     scenario = json.loads(scenario_json)
+    if not isinstance(scenario, dict) or set(scenario) != {
+        "temperature_c",
+        "allowed_min_c",
+        "allowed_max_c",
+        "expected_state",
+    }:
+        raise ValueError("Invalid held-out configuration")
+    for field in ("temperature_c", "allowed_min_c", "allowed_max_c"):
+        value = scenario[field]
+        if type(value) not in (int, float) or not math.isfinite(value):
+            raise ValueError("Invalid held-out configuration")
+    if (
+        not isinstance(scenario["expected_state"], str)
+        or not scenario["expected_state"]
+        or scenario["allowed_min_c"] > scenario["allowed_max_c"]
+    ):
+        raise ValueError("Invalid held-out configuration")
     reading_id = f"held-out-{uuid.uuid4().hex}"
     with httpx.Client(base_url=api_base_url, timeout=10.0) as client:
         response = client.post(
@@ -56,11 +74,21 @@ def run_held_out_check(scenario_json: str, api_base_url: str) -> bool:
     return False
 
 
+def main(scenario_json: str, api_base_url: str) -> int:
+    """Separate unavailable grading infrastructure from a failed runtime assertion."""
+    try:
+        passed = run_held_out_check(scenario_json, api_base_url)
+    except Exception:
+        # Never include exception text: it may contain protected inputs or responses.
+        print("HELD_OUT_INFRASTRUCTURE_ERROR: contact course support.", file=sys.stderr)
+        return 2
+    print("HELD_OUT_CHECK_PASSED" if passed else "HELD_OUT_CHECK_FAILED")
+    return 0 if passed else 1
+
+
 if __name__ == "__main__":
     # The scenario arrives through the environment, never as an argument: a command-line argument is
     # readable from /proc/<pid>/cmdline by any other process for as long as this one lives.
     scenario_env = os.environ.get("HELD_OUT_SCENARIO", "")
     api_base_url_env = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
-    passed = run_held_out_check(scenario_env, api_base_url_env)
-    print("HELD_OUT_CHECK_PASSED" if passed else "HELD_OUT_CHECK_FAILED")
-    sys.exit(0 if passed else 1)
+    sys.exit(main(scenario_env, api_base_url_env))

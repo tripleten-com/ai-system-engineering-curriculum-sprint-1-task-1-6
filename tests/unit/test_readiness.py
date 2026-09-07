@@ -27,6 +27,19 @@ READY = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(READY)
 
 
+class RefusingClient:
+    """Refuse every request, as a port with nothing listening behind it does."""
+
+    def __init__(self) -> None:
+        """Initialize the call count."""
+        self.calls = 0
+
+    def get(self, endpoint: str) -> httpx.Response:
+        """Raise a connection error on every call."""
+        self.calls += 1
+        raise httpx.ConnectError("connection refused")
+
+
 class TransientClient:
     """Fail one request before returning a healthy response."""
 
@@ -43,14 +56,58 @@ class TransientClient:
         return httpx.Response(200, request=request)
 
 
-def test_readiness_retries_a_transient_transport_failure() -> None:
+def test_readiness_retries_a_transient_transport_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """A just-started endpoint may reset once without failing the ready contract."""
     client = TransientClient()
+    monkeypatch.setattr(READY, "_no_containers_running", lambda: False)
 
-    error = READY._wait_for_endpoint(client, "http://example.test/health", attempts=2, delay=0)
+    errors = READY._wait_for_endpoints(
+        client,
+        endpoints={"api": "http://example.test/health"},
+        attempts=2,
+        delay=0,
+    )
 
-    assert error is None
+    assert errors == {}
     assert client.calls == 2
+
+
+def test_readiness_stops_waiting_when_no_container_is_running(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A student who never started the stack must get an answer, not a silent wait."""
+    client = RefusingClient()
+    monkeypatch.setattr(READY, "_no_containers_running", lambda: True)
+
+    errors = READY._wait_for_endpoints(
+        client,
+        endpoints={"api": "http://example.test/health"},
+        attempts=60,
+        delay=0,
+    )
+
+    assert list(errors) == ["api"]
+    assert client.calls == 1
+
+
+def test_readiness_polls_every_endpoint_on_each_pass(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A slow surface must not hide behind an earlier one that is still failing."""
+    client = RefusingClient()
+    monkeypatch.setattr(READY, "_no_containers_running", lambda: False)
+
+    errors = READY._wait_for_endpoints(
+        client,
+        endpoints={"api": "http://a.test", "grafana": "http://b.test"},
+        attempts=2,
+        delay=0,
+    )
+
+    assert sorted(errors) == ["api", "grafana"]
+    assert client.calls == 4
 
 
 def test_readiness_runs_compose_from_the_task_root() -> None:

@@ -12,6 +12,8 @@ Tools:             Python 3.12, pytest
 """
 
 import json
+import math
+import re
 import subprocess
 import sys
 from pathlib import Path, PurePosixPath
@@ -27,8 +29,8 @@ ALLOWED_PATHS = frozenset(
         "docs/student/decision-evidence-record.md",
     }
 )
-# Set to a relative path if this Task also has a second student-editable evidence file.
-BASELINE_PATH: str | None = "docs/student/decision-evidence-record.md"
+# Defense notes remain student-editable, but their prose is not an automated gate.
+BASELINE_PATH: str | None = None
 # If BASELINE_PATH is set, update these to match that file's own template placeholder text.
 BASELINE_MARKERS = frozenset(
     {
@@ -112,6 +114,17 @@ class _RestrictedYamlLoader(yaml.SafeLoader):  # type: ignore[misc]
         return mapping
 
 
+# Keep the shared SafeLoader untouched; YAML 1.2 does not treat yes/no/on/off
+# as booleans. Students can use those words as ordinary finite choices.
+_RestrictedYamlLoader.yaml_implicit_resolvers = {
+    key: [(tag, expression) for tag, expression in entries if tag != "tag:yaml.org,2002:bool"]
+    for key, entries in yaml.SafeLoader.yaml_implicit_resolvers.items()
+}
+_RestrictedYamlLoader.add_implicit_resolver(
+    "tag:yaml.org,2002:bool", re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"), list("tTfF")
+)
+
+
 class SubmissionError(ValueError):
     """Report one actionable public-verification failure."""
 
@@ -153,21 +166,44 @@ def validate_submission(
     if not isinstance(answers, dict):
         raise SubmissionError("answers must be one mapping")
 
-    for field, value in answers.items():
-        if isinstance(value, str) and (not value.strip() or "Replace this line" in value):
-            raise SubmissionError(f"answers.{field} is incomplete")
+    _validate_values(answers, "answers")
 
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     errors = sorted(
-        Draft202012Validator(schema).iter_errors(submission), key=lambda error: list(error.path)
+        Draft202012Validator(schema).iter_errors(submission),
+        key=lambda error: tuple(str(part) for part in error.path),
     )
     if errors:
         error = errors[0]
         location = ".".join(str(part) for part in error.absolute_path) or "submission"
-        raise SubmissionError(f"{location}: {error.message}")
+        detail = f"does not satisfy {error.validator}"
+        if error.validator == "enum":
+            detail = "choose one of: " + ", ".join(str(value) for value in error.validator_value)
+        elif error.validator == "type":
+            detail = f"expected {error.validator_value}"
+        raise SubmissionError(f"{location}: {detail}; see the field comment")
 
     if sample_path is not None and submission == _load_one_document(sample_path):
         raise SubmissionError("submission must not copy the fictional sample answers")
+
+
+def _validate_values(value: Any, path: str, depth: int = 0) -> None:
+    """Reject incomplete nested answers and non-finite values before schema checks."""
+    if depth > 40:
+        raise SubmissionError(f"{path}: answer nesting exceeds the supported depth")
+    if value is None or (
+        isinstance(value, str)
+        and (not value.strip() or value == "XXX" or "Replace this line" in value)
+    ):
+        raise SubmissionError(f"{path} is incomplete")
+    if isinstance(value, float) and not math.isfinite(value):
+        raise SubmissionError(f"{path}: expected a finite number")
+    if isinstance(value, dict):
+        for key, item in value.items():
+            _validate_values(item, f"{path}.{key}", depth + 1)
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            _validate_values(item, f"{path}.{index}", depth + 1)
 
 
 def validate_baseline(baseline_path: Path) -> None:
@@ -258,11 +294,15 @@ def _baseline_commit(repository_root: Path) -> str:
 def _load_one_document(path: Path) -> dict[str, Any]:
     """Load exactly one plain JSON-compatible YAML mapping."""
     try:
+        if path.stat().st_size > 131072:
+            raise SubmissionError(f"{path.name}: answer sheet exceeds 128 KiB")
         documents = list(
             yaml.load_all(path.read_text(encoding="utf-8"), Loader=_RestrictedYamlLoader)
         )
-    except yaml.YAMLError as exc:
+    except (yaml.YAMLError, RecursionError) as exc:
         raise SubmissionError(f"{path.name} must contain restricted YAML") from exc
+    except (OSError, UnicodeError) as exc:
+        raise SubmissionError(f"{path.name}: cannot read a UTF-8 answer sheet") from exc
     if len(documents) != 1 or not isinstance(documents[0], dict):
         raise SubmissionError(f"{path.name} must contain exactly one YAML mapping")
     return documents[0]

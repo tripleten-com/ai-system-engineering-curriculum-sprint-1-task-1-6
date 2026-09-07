@@ -68,7 +68,7 @@ poe verify
 | `poe verify` | Run the public student verification path |
 | `poe load-test` | Run this repository's supplied traffic profile |
 | `poe reset-baseline` | Clear exception and Redis data, then restart the worker between load runs |
-| `poe restart` | Restart API and worker processes |
+| `poe restart` | Restart the existing API and worker containers **without rebuilding**; run `poe start` instead after editing source |
 | `poe stop` | Remove containers and the network, keeping named volumes |
 | `poe reset` | Remove containers, the network, and local named volumes |
 
@@ -153,29 +153,43 @@ runtime evidence rather than from this guide.
 
 ## Task boundary
 
-Task 1.6 asks you to pass the automated held-out diagnostic gate and defend your Sprint 1 scaling
-recommendation in a 10-minute instructor review. This Task is read-only for application code — you
-add only new answer content and evidence-record content.
+Complete the supplied review cases, pass the single isolated protected held-out scenario, and prepare the one final instructor defense.
 
 Only these paths are student-editable:
 
 - `submission.yaml`
 - `docs/student/decision-evidence-record.md`
 
-The public verifier (`poe verify`) checks answer structure, completeness, and that only these paths
-changed. It cannot grade engineering judgment or your presentation. Opening your pull request also
-triggers a separate, protected `.github/workflows/protected-review.yml` workflow that replays an
-unseen held-out scenario against your running stack — its pass/fail appears as a second PR check,
-independent of the public one, and it never reveals the scenario's expected values. The instructor
-separately reviews your decision-evidence record and your 10-minute technical defense.
+Read [the evidence guide](docs/student/evidence-guide.md) and the versioned
+[fixed evidence pack](docs/student/evidence-pack.json) before completing `submission.yaml`.
+The sheet and its fictional sample show exact objects, values, and units. Graded
+analysis comes from this supplied pack; actual local investigations remain required
+and provide evidence for the final instructor defense. Keep those sources distinct.
+
+The public verifier checks answer structure, permitted changes, and the Task's
+published runtime behavior and public arithmetic checks. Protected automated answer
+checks establish semantic correctness against the public fixed pack. These protected
+answer checks are distinct from the single Task 1.6 held-out runtime scenario.
+Deterministic CI accepts Task
+answers; there is no separate instructor Task-answer grade. Green required public and protected CI opens
+the next Task. Sprint completion requires all six Task PRs CI-green and one final
+instructor defense covering empirical reasoning, uncertainty, alternatives, and judgment.
+
+Task 1.6 also runs the Sprint's single isolated protected held-out telemetry/capacity
+scenario through the published interface on the supplied trusted default-branch runtime.
+It is a runtime regression check, independent of candidate YAML answers and Markdown;
+it does not assess student diagnostic judgment. Its result is separate from public CI; a
+missing or skipped check is not a pass. Keep protected workflows and evaluator code
+unchanged. The Markdown record prepares the final defense and has no separate
+instructor answer grade; automated answer acceptance does not certify its prose.
 
 ### Student walkthrough
 
-See **Task 1.6: Held-Out and Instructor Presentation / Review** in your course platform for the full walkthrough. In outline: run the public pre-submission checks locally; assemble
-`docs/student/decision-evidence-record.md`, linking every scaling claim in your Task 1.5 ADR to a
-specific measurement or calculation from Tasks 1.1-1.5; complete `submission.yaml`; run
-`poe verify`; open your pull request and confirm the protected held-out check reports a status; then
-deliver your 10-minute technical defense to your instructor.
+Analyze the fixed review pack in `submission.yaml`. Prepare `docs/student/decision-evidence-record.md` using your own traces, repairs, repeated baseline experiments, controlled provider-delay run, and capacity reasoning. Label supplied reference data separately. Run the public check, open the PR, confirm the single protected held-out result, and defend the empirical evidence and judgment within 10 minutes.
+
+Run `./.tools/bin/uv run --frozen poe verify` from the repository root before
+submitting a feature-branch PR against `main`. See the course Task lesson for the
+three-Step walkthrough and exact matching acceptance/self-review criteria.
 
 ## Operational limits
 

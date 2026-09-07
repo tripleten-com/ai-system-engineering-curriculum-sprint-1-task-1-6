@@ -1,31 +1,23 @@
 # Coldline 10x Capacity Review (AI-Generated Draft)
 
-**Status:** Draft — generated before independent load-test verification. Audit every claim before
-treating this as a decision input.
+**Status:** Intentionally flawed audit exercise. C01-C10 are claims to assess, not trusted findings. Use the supplied evidence pack and policy.
 
-## Current baseline
+**C01.** The historical 0.29 seconds is pure worker service time.
 
-At current load, Coldline processes exceptions with a measured worker task duration of
-0.29 sec/job and observed throughput of 1.53 req/s.
+**C02.** Historical XLEN values 44 and 45 prove unfinished-job backlog.
 
-## Unit conversion
+**C03.** 1.53 API requests/second is completed-worker throughput and maximum capacity.
 
-Each sensor reading payload is approximately 500 bytes. At 10x scale, we expect 10 readings/sec.
-Total ingestion bandwidth: 500 x 10 = 5,000 bytes/sec. Converting to a rate of megabytes per hour:
-5,000 x 3,600 = 18,000,000 MB/hour.
+**C04.** At the supplied 10x sensor rate, 500 bytes x 1000 readings/second gives 1800000000 MB/hour.
 
-## Latency budget
+**C05.** At 1000 readings/second and an exception fraction of 0.012, arrival is 120 jobs/second.
 
-Total request latency budget is calculated as: API p95 latency + Worker p95 latency = Total p95 latency.
+**C06.** Seven days of raw readings require 43.2 GB total storage.
 
-## Recommendation
+**C07.** Required workers = ceil(ceil(arrival x service) x 1.3 x 1.3).
 
-Given projected 10x growth, we recommend migrating the entire platform to a multi-region
-Kubernetes cluster with automated horizontal pod autoscaling across three geographic regions, introducing
-a service mesh for traffic management, and moving off Redis Streams to a managed multi-region event
-streaming platform.
+**C08.** API p95 + worker p95 always equals end-to-end p95.
 
-## Appendix: raw load test data
+**C09.** These local runs justify immediate multi-region Kubernetes, a service mesh and a managed multi-region stream.
 
-Baseline run 1 and run 2 queue backlog, and the latency-injected run's throughput impact, are in
-`task-1-4-reference-metrics.yaml`.
+**C10.** The 10x arrival rate is an authored planning assumption, not a measured 10x run.

@@ -20,7 +20,6 @@ from tests.contract.submission_validation import (
     SubmissionError,
     _load_one_document,
     main,
-    validate_baseline,
     validate_changed_paths,
     validate_submission,
 )
@@ -29,33 +28,8 @@ ROOT = Path(__file__).parents[2]
 
 
 def valid_answers() -> dict[str, object]:
-    """Return a complete fictional answer sheet unrelated to Coldline outcomes."""
-    return {
-        "answers": {
-            "decision_evidence_mappings": (
-                "Fictional Recommendation: scale the fictional exception worker pool from 2 to 6 "
-                "fictional processes. Fictional Mapping 1: fictional Task 1.1 baseline confirmed "
-                "the fictional Redis Streams queue adapter as the only fictional asynchronous "
-                "hop. Fictional Mapping 2: fictional Task 1.3 telemetry repair restored fictional "
-                "end-to-end trace continuity for the fictional Task 1.4 load test. Fictional "
-                "Mapping 3: fictional Task 1.4's fictional latency-injection experiment ruled out "
-                "the fictional model provider as the bottleneck. Fictional Mapping 4: fictional "
-                "Task 1.5 capacity math produced a fictional required concurrency of 3.3, rounded "
-                "up with a fictional 30 percent safety margin to 6 fictional worker processes."
-            ),
-            "self_review_checklist": (
-                "Fictional self-review complete: fictional evidence record checked against Tasks "
-                "1.1-1.5, fictional submission scanned for secrets, and fictional presentation "
-                "timed under 10 minutes."
-            ),
-            "limitations_statement": (
-                "Fictional local Docker Compose tests cannot prove fictional multi-region "
-                "latency, fictional production cost, or fictional long-term reliability; only "
-                "fictional staging and production telemetry can confirm the fictional "
-                "recommendation holds at real 10x traffic."
-            ),
-        }
-    }
+    """Use the fictional teaching sample for shape tests, never a real answer key."""
+    return _load_one_document(ROOT / "submission-sample.yaml")
 
 
 def test_complete_answer_shape_passes_public_validation(tmp_path: Path) -> None:
@@ -93,7 +67,7 @@ def test_unexpected_answer_field_is_rejected(tmp_path: Path) -> None:
     submission = tmp_path / "submission.yaml"
     submission.write_text(yaml.safe_dump(answers), encoding="utf-8")
 
-    with pytest.raises(SubmissionError, match="Additional properties"):
+    with pytest.raises(SubmissionError, match="additionalProperties"):
         validate_submission(submission, ROOT / "docs/contracts/submission.schema.json")
 
 
@@ -126,26 +100,18 @@ def test_only_student_editable_paths_are_permitted() -> None:
         validate_changed_paths(["loadtest/model_provider_latency.py"])
 
 
-def test_baseline_template_is_rejected_and_edited_copy_passes(tmp_path: Path) -> None:
-    """The evidence-record baseline gate must reject the template and accept a real edit."""
-    baseline = tmp_path / "decision-evidence-record.md"
-    baseline.write_text(
-        (ROOT / "docs/student/decision-evidence-record.md").read_text(encoding="utf-8"),
+def test_defense_notes_are_not_graded_by_template_markers(tmp_path: Path) -> None:
+    """Technical acceptance must not turn narrative completeness into a CI gate."""
+    (tmp_path / "docs/contracts").mkdir(parents=True)
+    (tmp_path / "docs/contracts/submission.schema.json").write_text(
+        (ROOT / "docs/contracts/submission.schema.json").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
-
-    with pytest.raises(SubmissionError, match="template markers"):
-        validate_baseline(baseline)
-
-    baseline.write_text(
-        "# Decision-Evidence Record\n\n"
-        "| Claim | Source | What it proves | Limitation |\n"
-        "|---|---|---|---|\n"
-        "| Fictional worker concurrency drives the bottleneck | Fictional Task 1.4 load test | "
-        "Fictional queue backlog grew while CPU stayed low | Fictional local-only evidence |\n",
-        encoding="utf-8",
-    )
-    validate_baseline(baseline)
+    (tmp_path / "submission.yaml").write_text(yaml.safe_dump(valid_answers()), encoding="utf-8")
+    # Deliberately different synthetic reference prevents exact-copy rejection;
+    # the candidate is still the public fictional shape, not a protected solution.
+    (tmp_path / "submission-sample.yaml").write_text("answers: {}", encoding="utf-8")
+    assert main(tmp_path, changed_paths=[]) == 0
 
 
 def test_public_entrypoint_reports_an_incomplete_answer_sheet(
@@ -165,7 +131,7 @@ def test_public_entrypoint_reports_an_incomplete_answer_sheet(
     )
 
     assert main(tmp_path, changed_paths=[]) == 1
-    assert "answers.decision_evidence_mappings is incomplete" in capsys.readouterr().err
+    assert "answers.decision_evidence_mappings" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize(

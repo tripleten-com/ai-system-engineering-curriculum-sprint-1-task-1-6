@@ -2,20 +2,464 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["answers"],
+  "required": [
+    "answers"
+  ],
   "properties": {
     "answers": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "decision_evidence_mappings",
-        "self_review_checklist",
-        "limitations_statement"
+        "review_cases",
+        "limitations_statement",
+        "next_measurement"
       ],
       "properties": {
-        "decision_evidence_mappings": { "type": "string", "minLength": 300, "maxLength": 3000 },
-        "self_review_checklist": { "type": "string", "minLength": 40, "maxLength": 500 },
-        "limitations_statement": { "type": "string", "minLength": 100, "maxLength": 1000 }
+        "decision_evidence_mappings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "D01",
+            "D02",
+            "D03",
+            "D04"
+          ],
+          "properties": {
+            "D01": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assessment",
+                "evidence_ids"
+              ],
+              "properties": {
+                "assessment": {
+                  "type": "string",
+                  "enum": [
+                    "supported",
+                    "contradicted",
+                    "insufficient-evidence"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            },
+            "D02": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assessment",
+                "evidence_ids"
+              ],
+              "properties": {
+                "assessment": {
+                  "type": "string",
+                  "enum": [
+                    "supported",
+                    "contradicted",
+                    "insufficient-evidence"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            },
+            "D03": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assessment",
+                "evidence_ids"
+              ],
+              "properties": {
+                "assessment": {
+                  "type": "string",
+                  "enum": [
+                    "supported",
+                    "contradicted",
+                    "insufficient-evidence"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            },
+            "D04": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assessment",
+                "evidence_ids"
+              ],
+              "properties": {
+                "assessment": {
+                  "type": "string",
+                  "enum": [
+                    "supported",
+                    "contradicted",
+                    "insufficient-evidence"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "review_cases": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "R01",
+            "R02",
+            "R03",
+            "R04"
+          ],
+          "properties": {
+            "R01": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "verdict",
+                "reason",
+                "evidence_ids"
+              ],
+              "properties": {
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "valid",
+                    "invalid",
+                    "needs-more-evidence"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "retained-entries-are-not-outstanding",
+                    "marginal-percentiles-are-not-additive",
+                    "acceptance-is-not-completion",
+                    "assumptions-and-measurements-separated",
+                    "local-results-prove-production"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            },
+            "R02": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "verdict",
+                "reason",
+                "evidence_ids"
+              ],
+              "properties": {
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "valid",
+                    "invalid",
+                    "needs-more-evidence"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "retained-entries-are-not-outstanding",
+                    "marginal-percentiles-are-not-additive",
+                    "acceptance-is-not-completion",
+                    "assumptions-and-measurements-separated",
+                    "local-results-prove-production"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            },
+            "R03": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "verdict",
+                "reason",
+                "evidence_ids"
+              ],
+              "properties": {
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "valid",
+                    "invalid",
+                    "needs-more-evidence"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "retained-entries-are-not-outstanding",
+                    "marginal-percentiles-are-not-additive",
+                    "acceptance-is-not-completion",
+                    "assumptions-and-measurements-separated",
+                    "local-results-prove-production"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            },
+            "R04": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "verdict",
+                "reason",
+                "evidence_ids"
+              ],
+              "properties": {
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "valid",
+                    "invalid",
+                    "needs-more-evidence"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "retained-entries-are-not-outstanding",
+                    "marginal-percentiles-are-not-additive",
+                    "acceptance-is-not-completion",
+                    "assumptions-and-measurements-separated",
+                    "local-results-prove-production"
+                  ]
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "uniqueItems": true,
+                  "x-order-independent": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "E61",
+                      "E62",
+                      "E63",
+                      "E64",
+                      "E65",
+                      "E66"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "limitations_statement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classifications",
+            "evidence_ids"
+          ],
+          "properties": {
+            "classifications": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true,
+              "x-order-independent": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "production-capacity-unproven",
+                  "managed-service-behavior-unproven",
+                  "model-quality-unproven",
+                  "all-production-behavior-proven"
+                ]
+              }
+            },
+            "evidence_ids": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true,
+              "x-order-independent": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "E61",
+                  "E62",
+                  "E63",
+                  "E64",
+                  "E65",
+                  "E66"
+                ]
+              }
+            }
+          }
+        },
+        "next_measurement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "measurement",
+            "purpose",
+            "evidence_ids"
+          ],
+          "properties": {
+            "measurement": {
+              "type": "string",
+              "enum": [
+                "two-worker-completions-queue-age-db-p95-duplicates",
+                "add-component-p95-values",
+                "multi-region-deploy-without-pilot"
+              ]
+            },
+            "purpose": {
+              "type": "string",
+              "enum": [
+                "test-scaling-contention-and-duplicate-risk",
+                "prove-production-availability"
+              ]
+            },
+            "evidence_ids": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true,
+              "x-order-independent": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "E61",
+                  "E62",
+                  "E63",
+                  "E64",
+                  "E65",
+                  "E66"
+                ]
+              }
+            }
+          }
+        }
       }
     }
   }
