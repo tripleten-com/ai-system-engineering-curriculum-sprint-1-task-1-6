@@ -5,15 +5,18 @@ Only these paths are student-editable for this Task:
 - `submission.yaml`
 - `docs/student/decision-evidence-record.md`
 
-All other files are protected. `.github/workflows/protected-review.yml` and
-`tests/contract/held_out_review.py` are explicitly protected. The held-out workflow executes their
-trusted default-branch versions; candidate changes to protected paths invalidate the submission.
+All other files are protected, including `tests/contract/held_out_review.py`.
+The course's CMS integration runs protected grading on the registered trusted release;
+candidate changes to protected paths invalidate the submission.
 If completing this Task genuinely requires a change elsewhere, stop and
 ask your instructor before proceeding — do not assume it's permitted.
 
-Run `poe verify` before submitting. Opening your pull request also triggers a separate protected
-workflow (`.github/workflows/protected-review.yml`) that replays the existing held-out scenario on
-an isolated copy of the supplied default-branch stack. This required runtime regression check is
+Run `poe verify` before submitting. The course's CMS integration evaluates the submitted
+PR commit and reports the protected result on that exact commit. The held-out check
+is course-managed; it is not a workflow file in this repository. Confirm its result
+alongside public verification and protected answer correctness. A missing or skipped
+result is not a pass. It replays the existing held-out scenario on an isolated copy
+of the registered trusted stack. This required runtime regression check is
 independent of your answers and Markdown notes. It does not assess your diagnostic judgment;
 the protected answer evaluator and final defense cover their respective assessment scopes.
 
