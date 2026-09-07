@@ -1,80 +1,187 @@
 # Coldline - Task 1.6
 # File: submission.yaml
-# Complete the structured answers from docs/student/evidence-pack.json.
-# Nulls are intentionally incomplete. Live investigations are required practical work
-# and evidence for instructor defense; fixed-pack values answer this assessed case.
-# See submission-sample.yaml for a fictional completed shape.
+# Edit only answer values in submission.yaml; keep the supplied keys and types.
+# Empty strings, nulls, and placeholder text are incomplete and fail verification.
+# Use submission-sample.yaml for YAML formatting only; do not copy its fictional values.
+# Do not include secrets, personal data, or local absolute paths.
+# Use docs/student/evidence-pack.json for assessed answers; retain your required local
+# investigations for the final defense.
+
 answers:
+
+  # Task 1.6 — Step 2: Assembling decision evidence and structured answers
+  # Assess each D01-D04 decision claim and select its required number of evidence records. The
+  # quoted claims are statements to assess, not confirmed findings.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # assessment options (use exact values):
+  # - supported: The supplied evidence establishes the claim within its stated bounds.
+  # - contradicted: The supplied evidence establishes the opposite of the claim.
+  # - insufficient-evidence: The supplied evidence does not establish the claim or its opposite.
+  #
+  # evidence_ids options (use exact values):
+  # - E61: API and worker source observations.
+  # - E62: Captured baseline and injected load results.
+  # - E63: Planning model and its inputs.
+  # - E64: Two-worker pilot operating policy.
+  # - E65: Provider and deployment fidelity boundaries.
+  # - E66: Queue, duration, and percentile measurement definitions.
   decision_evidence_mappings:
+    # D01: The observed downstream worker stage warrants a bounded scaling investigation.
+    # Source: docs/student/evidence-pack.json, decision_claims.D01.
     D01:
-      # Choose one: supported, contradicted, insufficient-evidence.
+      # Support for this claim: choose one string from assessment options above.
       assessment: null
-      # Choose 2 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 2 IDs from evidence_ids options above; no duplicates.
       evidence_ids: null
+    # D02: The planning worker count is a modeled estimate, not observed production capacity.
+    # Source: docs/student/evidence-pack.json, decision_claims.D02.
     D02:
-      # Choose one: supported, contradicted, insufficient-evidence.
+      # Support for this claim: choose one string from assessment options above.
       assessment: null
-      # Choose 2 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 2 IDs from evidence_ids options above; no duplicates.
       evidence_ids: null
+    # D03: Use a two-worker local pilot with rollback and measurement gates.
+    # Source: docs/student/evidence-pack.json, decision_claims.D03.
     D03:
-      # Choose one: supported, contradicted, insufficient-evidence.
+      # Support for this claim: choose one string from assessment options above.
       assessment: null
-      # Choose 1 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 1 ID from evidence_ids options above; no duplicates.
       evidence_ids: null
+    # D04: Claim the local test proves production model quality and high availability.
+    # Source: docs/student/evidence-pack.json, decision_claims.D04.
     D04:
-      # Choose one: supported, contradicted, insufficient-evidence.
+      # Support for this claim: choose one string from assessment options above.
       assessment: null
-      # Choose 1 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 1 ID from evidence_ids options above; no duplicates.
       evidence_ids: null
+
+  # Task 1.6 — Step 1: Public verification before the held-out gate
+  # Evaluate each R01-R04 reviewer statement. Select a verdict, its reason, and one evidence record.
+  # These cases do not report the outcome of your own CI or defense.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # verdict options (use exact values):
+  # - valid: The reviewer's reasoning is justified by the supplied evidence.
+  # - invalid: The reviewer's reasoning misuses a measurement or makes an invalid deduction.
+  # - needs-more-evidence: The supplied evidence is not sufficient to decide whether the reasoning
+  #   holds.
+  #
+  # reason options (use exact values):
+  # - retained-entries-are-not-outstanding: Retained stream entries and unfinished jobs represent
+  #   different counts.
+  # - marginal-percentiles-are-not-additive: Separate component percentiles do not add up to an
+  #   end-to-end percentile.
+  # - acceptance-is-not-completion: Accepting work and finishing its background processing are
+  #   different events.
+  # - assumptions-and-measurements-separated: Planning assumptions are explicitly distinguished from
+  #   observed measurements.
+  # - local-results-prove-production: The claim that local results establish production behavior.
+  #
+  # evidence_ids options (use exact values):
+  # - E61: API and worker source observations.
+  # - E62: Captured baseline and injected load results.
+  # - E63: Planning model and its inputs.
+  # - E64: Two-worker pilot operating policy.
+  # - E65: Provider and deployment fidelity boundaries.
+  # - E66: Queue, duration, and percentile measurement definitions.
   review_cases:
+    # R01: A reviewer substitutes Redis XLEN for unfinished-job backlog.
+    # Source: docs/student/evidence-pack.json, review_cases.R01.
     R01:
-      # Choose one: valid, invalid, needs-more-evidence.
+      # Verdict on this review: choose one string from verdict options above.
       verdict: null
-      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      # Reason for your verdict: choose one string from reason options above.
       reason: null
-      # Choose 1 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 1 ID from evidence_ids options above; no duplicates.
       evidence_ids: null
+    # R02: A reviewer adds API p95 and worker p95 to claim end-to-end p95.
+    # Source: docs/student/evidence-pack.json, review_cases.R02.
     R02:
-      # Choose one: valid, invalid, needs-more-evidence.
+      # Verdict on this review: choose one string from verdict options above.
       verdict: null
-      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      # Reason for your verdict: choose one string from reason options above.
       reason: null
-      # Choose 1 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 1 ID from evidence_ids options above; no duplicates.
       evidence_ids: null
+    # R03: A reviewer cites a source-defined 202 response as proof the asynchronous job completed.
+    # Source: docs/student/evidence-pack.json, review_cases.R03.
     R03:
-      # Choose one: valid, invalid, needs-more-evidence.
+      # Verdict on this review: choose one string from verdict options above.
       verdict: null
-      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      # Reason for your verdict: choose one string from reason options above.
       reason: null
-      # Choose 1 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 1 ID from evidence_ids options above; no duplicates.
       evidence_ids: null
+    # R04: A reviewer separates hypothetical 10x traffic inputs from measured local service time.
+    # Source: docs/student/evidence-pack.json, review_cases.R04.
     R04:
-      # Choose one: valid, invalid, needs-more-evidence.
+      # Verdict on this review: choose one string from verdict options above.
       verdict: null
-      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      # Reason for your verdict: choose one string from reason options above.
       reason: null
-      # Choose 1 unique selections; order does not matter.
-      # Allowed values: E61, E62, E63, E64, E65, E66.
+      # Evidence: list of exactly 1 ID from evidence_ids options above; no duplicates.
       evidence_ids: null
+
+  # Task 1.6 — Step 2: Assembling decision evidence and structured answers
+  # Select exactly three limitations of the supplied case and one evidence record.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # classifications options (use exact values):
+  # - production-capacity-unproven: The supplied evidence does not establish production processing
+  #   capacity.
+  # - managed-service-behavior-unproven: The supplied evidence does not establish managed cloud
+  #   service behavior.
+  # - model-quality-unproven: The supplied evidence does not establish production model output
+  #   quality.
+  # - all-production-behavior-proven: The supplied evidence establishes all production behavior.
+  #
+  # evidence_ids options (use exact values):
+  # - E61: API and worker source observations.
+  # - E62: Captured baseline and injected load results.
+  # - E63: Planning model and its inputs.
+  # - E64: Two-worker pilot operating policy.
+  # - E65: Provider and deployment fidelity boundaries.
+  # - E66: Queue, duration, and percentile measurement definitions.
   limitations_statement:
-    # Choose 3 unique selections; order does not matter.
-    # Allowed values: production-capacity-unproven, managed-service-behavior-unproven, model-quality-unproven, all-production-behavior-proven.
+    # Select the limitations established for the supplied case.
+    # YAML list: choose 3 unique values from the classifications options above; order does not
+    # matter.
     classifications: null
-    # Choose 1 unique selections; order does not matter.
-    # Allowed values: E61, E62, E63, E64, E65, E66.
+    # Select the evidence records supporting this answer.
+    # YAML list: choose 1 unique value from the evidence_ids options above; order does not matter.
     evidence_ids: null
+
+  # Task 1.6 — Step 2: Assembling decision evidence and structured answers
+  # Select the next measurement, its purpose, and one supporting record using the supplied policy.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # measurement options (use exact values):
+  # - two-worker-completions-queue-age-db-p95-duplicates: Measure completion rate, oldest
+  #   outstanding age, database p95, and duplicate effects with two workers.
+  # - add-component-p95-values: Add the separate components' 95th-percentile durations.
+  # - multi-region-deploy-without-pilot: Deploy across multiple regions without first running a
+  #   pilot.
+  #
+  # purpose options (use exact values):
+  # - test-scaling-contention-and-duplicate-risk: Investigate resource contention and repeated side
+  #   effects when scaling.
+  # - prove-production-availability: Establish the system's availability in production.
+  #
+  # evidence_ids options (use exact values):
+  # - E61: API and worker source observations.
+  # - E62: Captured baseline and injected load results.
+  # - E63: Planning model and its inputs.
+  # - E64: Two-worker pilot operating policy.
+  # - E65: Provider and deployment fidelity boundaries.
+  # - E66: Queue, duration, and percentile measurement definitions.
   next_measurement:
-    # Choose one: two-worker-completions-queue-age-db-p95-duplicates, add-component-p95-values, multi-region-deploy-without-pilot.
+    # Select the next measurement.
+    # Choose one string from the measurement options above.
     measurement: null
-    # Choose one: test-scaling-contention-and-duplicate-risk, prove-production-availability.
+    # Select the purpose of that measurement.
+    # Choose one string from the purpose options above.
     purpose: null
-    # Choose 1 unique selections; order does not matter.
-    # Allowed values: E61, E62, E63, E64, E65, E66.
+    # Select the evidence records supporting this answer.
+    # YAML list: choose 1 unique value from the evidence_ids options above; order does not matter.
     evidence_ids: null
