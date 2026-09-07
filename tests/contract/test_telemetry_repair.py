@@ -22,6 +22,7 @@ Note on runtime addressing:
 """
 
 import asyncio
+import math
 import subprocess
 import uuid
 from datetime import UTC, datetime
@@ -29,7 +30,13 @@ from pathlib import Path
 
 import httpx
 import pytest
+from prometheus_client.parser import text_string_to_metric_families
 
+from tests.e2e.test_exception_workflow import (
+    _load_unique_reading,
+    _wait_for_service_evidence,
+    _wait_for_terminal,
+)
 from tests.runtime_config import host_port
 
 TASK_ROOT = Path(__file__).resolve().parents[2]
@@ -155,9 +162,44 @@ def test_trace_propagation_script_is_valid_python() -> None:
 
 
 def test_trace_context_survives_the_redis_streams_round_trip() -> None:
-    """The worker's span must be a child of the publishing span's trace, not a new root."""
+    """Require the real HTTP publisher and worker loop to form one parent chain."""
+    _, reading = _load_unique_reading()
+    api_port = host_port("COLDLINE_API_HOST_PORT", 8000)
+    with httpx.Client(base_url=f"http://localhost:{api_port}", timeout=10) as client:
+        response = client.post("/api/v1/readings", json=reading)
+        assert response.status_code == 202
+        accepted = response.json()
+        record = _wait_for_terminal(client, accepted["status_url"])
+        assert record["summary"] and record["failure_reason"] is None
+        replay = client.post("/api/v1/readings", json=reading)
+        assert replay.status_code == 202
+        assert replay.json()["exception_id"] == accepted["exception_id"]
+        normal = {**reading, "reading_id": f"normal-{uuid.uuid4().hex}", "temperature_c": 5}
+        assert client.post("/api/v1/readings", json=normal).status_code == 422
+    api_traces = _wait_for_service_evidence("coldline-api", accepted["exception_id"])
+    worker_traces = _wait_for_service_evidence("coldline-worker", accepted["exception_id"])
+    assert api_traces and worker_traces, "Both live services must export trace evidence"
+    publications = {
+        (span["traceID"], span["spanID"])
+        for item in api_traces
+        for span in item["spans"]
+        if span["operationName"] == "job_queue.publish"
+    }
+    workers = [
+        span
+        for item in worker_traces
+        for span in item["spans"]
+        if span["operationName"] == "coldline.process_exception"
+    ]
+    assert publications and workers
+    assert any(
+        (span["traceID"], ref["spanID"]) in publications
+        and ref["traceID"] == span["traceID"]
+        and ref["refType"] == "CHILD_OF"
+        for span in workers
+        for ref in span["references"]
+    ), "The actual worker loop must continue the API publishing span, not create a root"
     result = _run_script_in_worker(_TRACE_PROPAGATION_SCRIPT)
-
     assert result.returncode == 0 and "TRACE_PROPAGATION_OK" in result.stdout, (
         result.stdout + result.stderr
     )
@@ -167,18 +209,32 @@ def test_metric_has_no_unbound_labels() -> None:
     """The processing-duration histogram must not carry a per-request label."""
     from worker.metrics import PROCESSING_DURATION
 
-    label_names = PROCESSING_DURATION._labelnames  # prometheus_client exposes this privately
-    assert "request_id" not in label_names, (
-        "coldline_exception_processing_duration_seconds still has an unbound request_id "
-        "label — every processed exception creates a new Prometheus time series"
+    bounded_values = {
+        "status": {"COMPLETED", "FAILED"},
+        "outcome": {"completed", "failed", "success", "failure"},
+        "disposition": {"ACK", "ACK_EXISTING", "ACK_MISSING", "RETRY"},
+    }
+    label_names = PROCESSING_DURATION._labelnames
+    assert set(label_names) <= bounded_values.keys(), (
+        "Use an aggregate or the documented bounded status/outcome/disposition dimensions"
     )
+    result = _read_worker_metrics()
+    assert result.returncode == 0, result.stdout + result.stderr
+    for family in text_string_to_metric_families(result.stdout):
+        for sample in family.samples:
+            if sample.name.startswith("coldline_exception_processing_duration_seconds"):
+                for label, value in sample.labels.items():
+                    if label != "le":
+                        assert label in bounded_values and value in bounded_values[label], (
+                            "Histogram application dimensions must use finite documented values"
+                        )
 
 
 def _sum_bucket_values(metrics_text: str, *, le: str) -> float:
     """Sum every processing-duration bucket sample at the given `le`, across any labels.
 
     Summing rather than filtering by a specific label keeps this comparable before and
-    after Task 8's real fix, which removes the `request_id` label from
+    after the next checkpoint's real fix, which removes the `request_id` label from
     `PROCESSING_DURATION` entirely (see `test_metric_has_no_unbound_labels`) — so a
     `request_id`-keyed filter would find zero samples once that fix lands, even though
     the unit bug this test targets is a separate, orthogonal defect.
@@ -198,14 +254,30 @@ async def test_metric_records_real_seconds_not_milliseconds() -> None:
     """A sub-second exception must not show up thousands of times too large in the histogram.
 
     Isolates the one observation this test triggers with a before/after delta on the
-    le="1.0" bucket total (summed across whatever labels the histogram currently
+    le="5.0" bucket total (summed across whatever labels the histogram currently
     carries), rather than filtering by `request_id`: that label is a separate defect
-    Task 8 removes entirely, so a `request_id`-keyed filter would break once both
+    the next checkpoint removes entirely, so a `request_id`-keyed filter would break once both
     defects are correctly fixed together, even though the unit bug would be fixed too.
     """
+    result = _run_script_in_worker("""
+from datetime import UTC, datetime, timedelta
+import inspect
+from worker.metrics import PROCESSING_DURATION, observe_processing_duration
+start = datetime(2026, 1, 1, tzinfo=UTC)
+parameters = inspect.signature(observe_processing_duration).parameters
+values = {"request_id": "unit-contract", "status": "COMPLETED",
+          "outcome": "completed", "disposition": "ACK"}
+kwargs = {name: value for name, value in values.items() if name in parameters}
+observe_processing_duration(start, start + timedelta(seconds=0.25), **kwargs)
+samples = [s for m in PROCESSING_DURATION.collect() for s in m.samples]
+assert sum(s.value for s in samples if s.name.endswith("_count")) == 1
+total = sum(s.value for s in samples if s.name.endswith("_sum"))
+assert abs(total - 0.25) < 1e-9, "histogram must record seconds"
+""")
+    assert result.returncode == 0, result.stdout + result.stderr
     before = _read_worker_metrics()
     assert before.returncode == 0, before.stdout + before.stderr
-    before_le_1s = _sum_bucket_values(before.stdout, le="1.0")
+    before_le_5s = _sum_bucket_values(before.stdout, le="5.0")
 
     api_port = host_port("COLDLINE_API_HOST_PORT", 8000)
     async with httpx.AsyncClient(base_url=f"http://localhost:{api_port}", timeout=10.0) as client:
@@ -237,15 +309,37 @@ async def test_metric_records_real_seconds_not_milliseconds() -> None:
 
     after = _read_worker_metrics()
     assert after.returncode == 0, after.stdout + after.stderr
-    after_le_1s = _sum_bucket_values(after.stdout, le="1.0")
+    after_le_5s = _sum_bucket_values(after.stdout, le="5.0")
 
     # The deterministic provider's configured latency is well under one second, so a
-    # correctly unit-converted observation must land at or below the le="1.0" bucket. If
+    # correctly unit-converted observation must land at or below the le="5.0" bucket. If
     # the duration were still recorded in milliseconds, this delta would stay at 0 and
     # the sample would only ever reach the +Inf bucket instead.
-    delta = after_le_1s - before_le_1s
+    delta = after_le_5s - before_le_5s
     assert delta == 1, (
-        f"processing duration for the job just completed did not land in the <=1.0s "
-        f'bucket (le="1.0" count changed by {delta}, expected 1) — looks like it\'s '
+        f"processing duration for the job just completed did not land in the <=5.0s "
+        f'bucket (le="5.0" count changed by {delta}, expected 1) — looks like it\'s '
         "still being recorded in milliseconds instead of seconds"
     )
+
+    # The real dashboard query must become finite after Prometheus scrapes the job.
+    prometheus_port = host_port("COLDLINE_PROMETHEUS_HOST_PORT", 9090)
+    query = (
+        "histogram_quantile(0.95, sum by (le) "
+        "(rate(coldline_exception_processing_duration_seconds_bucket[5m]))) "
+        "and on() (sum(rate(coldline_exception_processing_duration_seconds_bucket"
+        '{le="5.0"}[5m])) > 0)'
+    )
+    async with httpx.AsyncClient(timeout=5) as client:
+        for _ in range(30):
+            response = await client.get(
+                f"http://localhost:{prometheus_port}/api/v1/query", params={"query": query}
+            )
+            response.raise_for_status()
+            values = response.json()["data"]["result"]
+            if values and math.isfinite(float(values[0]["value"][1])):
+                assert 0 <= float(values[0]["value"][1]) <= 5
+                break
+            await asyncio.sleep(0.5)
+        else:
+            pytest.fail("Published p95 query did not produce a finite seconds value")

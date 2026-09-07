@@ -1,0 +1,58 @@
+{
+  "task": "1.6",
+  "case_id": "fixed-public-synthesis-case",
+  "provenance": {
+    "kind": "authored-synthesis-of-listed-source-observations-and-captured-evidence",
+    "note": "This visible case assesses evidence mapping; it is separate from the existing single protected held-out runtime scenario and from the student authored Markdown defense."
+  },
+  "evidence_catalog": {
+    "E61": {
+      "kind": "source-observation",
+      "observation": "The API persists and publishes an exception then returns 202; the sequential worker calls the deterministic-local provider and persists terminal state."
+    },
+    "E62": {
+      "kind": "captured-local-runtime",
+      "source": "Task 1.4 load-capture-2026-09-06",
+      "observation": "Baseline 2 accepted 2481 and completed 106; injected run accepted 2383 and completed 48, in their documented windows.",
+      "baseline_window_seconds": 33.078944,
+      "injected_window_seconds": 32.567813
+    },
+    "E63": {
+      "kind": "authored-planning-input-and-calculation",
+      "observation": "Worker count model applies one 30% margin to projected arrival times pooled service, then ceilings once. Inputs are hypothetical traffic plus captured local worker service.",
+      "service_seconds_per_job": 0.268234,
+      "arrival_jobs_per_second": 12,
+      "margin_fraction": 0.3
+    },
+    "E64": {
+      "kind": "authored-operating-policy",
+      "observation": "A two-worker local pilot rolls back on duplicate side effects or database p95 >200 ms; measure completions, queue age, database p95 and duplicates."
+    },
+    "E65": {
+      "kind": "fidelity-boundary",
+      "observation": "The provider is deterministic-local; the local Compose topology has no production availability, cloud elasticity, provider-quality or production capacity guarantee."
+    },
+    "E66": {
+      "kind": "measurement-definition",
+      "observation": "Redis XLEN counts retained entries; accepted-to-terminal durations include queue wait; API and worker marginal p95 values cannot be added to recover end-to-end p95."
+    }
+  },
+  "decision_claims": {
+    "D01": "The observed downstream worker stage warrants a bounded scaling investigation.",
+    "D02": "The planning worker count is a modeled estimate, not observed production capacity.",
+    "D03": "Use a two-worker local pilot with rollback and measurement gates.",
+    "D04": "Claim the local test proves production model quality and high availability."
+  },
+  "review_cases": {
+    "R01": "A reviewer substitutes Redis XLEN for unfinished-job backlog.",
+    "R02": "A reviewer adds API p95 and worker p95 to claim end-to-end p95.",
+    "R03": "A reviewer cites a source-defined 202 response as proof the asynchronous job completed.",
+    "R04": "A reviewer separates hypothetical 10x traffic inputs from measured local service time."
+  },
+  "selection_instruction": "For each claim/review, select all minimal directly applicable evidence records. D01 needs topology and load observations; D02 needs the model and its fidelity boundary. Use the stated pilot policy for the next measurement.",
+  "definitions": {
+    "supported": "Evidence directly establishes the bounded claim.",
+    "contradicted": "Evidence directly establishes the opposite.",
+    "insufficient-evidence": "Evidence does not establish the claim, even when it warns against assuming it."
+  }
+}

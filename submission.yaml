@@ -1,27 +1,80 @@
 # Coldline - Task 1.6
 # File: submission.yaml
-# Component: Student answer sheet
-# Purpose: Record the Task 1.6 decision-evidence synthesis, self-review, and limitations statement.
-# Interacts With: Submission schema and public verifier
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.6
-# Concepts: Decision-evidence records, self-review, held-out evaluation
-# Tools: YAML
-
-# Complete each answer after assembling docs/student/decision-evidence-record.md and reviewing your
-# Sprint 1 evidence chain ahead of the instructor technical defense.
-# Empty values and placeholder text fail public verification.
-# Do not submit secrets, personal data, local absolute paths, or protected evaluator details.
-# See submission-sample.yaml for a completed fictional shape.
+# Complete the structured answers from docs/student/evidence-pack.json.
+# Nulls are intentionally incomplete. Live investigations are required practical work
+# and evidence for instructor defense; fixed-pack values answer this assessed case.
+# See submission-sample.yaml for a fictional completed shape.
 answers:
-  # 300-3000 characters. Summarize how each scaling claim in your ADR maps to a specific
-  # measurement or calculation from Tasks 1.1-1.5. See docs/student/decision-evidence-record.md
-  # for the full claim-by-claim table this summary is drawn from.
-  decision_evidence_mappings: |
-    Replace this line with your decision-evidence mapping summary.
-  # 40-500 characters.
-  self_review_checklist: |
-    Replace this line with your self-review checklist confirmation.
-  # 100-1000 characters.
-  limitations_statement: |
-    Replace this line with your limitations statement about what local Docker Compose testing
-    cannot prove.
+  decision_evidence_mappings:
+    D01:
+      # Choose one: supported, contradicted, insufficient-evidence.
+      assessment: null
+      # Choose 2 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+    D02:
+      # Choose one: supported, contradicted, insufficient-evidence.
+      assessment: null
+      # Choose 2 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+    D03:
+      # Choose one: supported, contradicted, insufficient-evidence.
+      assessment: null
+      # Choose 1 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+    D04:
+      # Choose one: supported, contradicted, insufficient-evidence.
+      assessment: null
+      # Choose 1 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+  review_cases:
+    R01:
+      # Choose one: valid, invalid, needs-more-evidence.
+      verdict: null
+      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      reason: null
+      # Choose 1 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+    R02:
+      # Choose one: valid, invalid, needs-more-evidence.
+      verdict: null
+      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      reason: null
+      # Choose 1 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+    R03:
+      # Choose one: valid, invalid, needs-more-evidence.
+      verdict: null
+      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      reason: null
+      # Choose 1 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+    R04:
+      # Choose one: valid, invalid, needs-more-evidence.
+      verdict: null
+      # Choose one: retained-entries-are-not-outstanding, marginal-percentiles-are-not-additive, acceptance-is-not-completion, assumptions-and-measurements-separated, local-results-prove-production.
+      reason: null
+      # Choose 1 unique selections; order does not matter.
+      # Allowed values: E61, E62, E63, E64, E65, E66.
+      evidence_ids: null
+  limitations_statement:
+    # Choose 3 unique selections; order does not matter.
+    # Allowed values: production-capacity-unproven, managed-service-behavior-unproven, model-quality-unproven, all-production-behavior-proven.
+    classifications: null
+    # Choose 1 unique selections; order does not matter.
+    # Allowed values: E61, E62, E63, E64, E65, E66.
+    evidence_ids: null
+  next_measurement:
+    # Choose one: two-worker-completions-queue-age-db-p95-duplicates, add-component-p95-values, multi-region-deploy-without-pilot.
+    measurement: null
+    # Choose one: test-scaling-contention-and-duplicate-risk, prove-production-availability.
+    purpose: null
+    # Choose 1 unique selections; order does not matter.
+    # Allowed values: E61, E62, E63, E64, E65, E66.
+    evidence_ids: null

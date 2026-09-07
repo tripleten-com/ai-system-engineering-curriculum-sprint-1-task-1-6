@@ -1,47 +1,27 @@
-# Coldline - Task 1.5 supporting fixture
-# File: docs/student/task-1-4-reference-metrics.yaml
-# Purpose: Real Task 1.4 load-test measurements, shipped so Task 1.5 does not depend on
-#          the student's own separate Task 1.4 repository.
-#
-# Provenance notes:
-# - The original capture (baseline throughput ~100-120 req/s from 20 Locust users at
-#   0.05-0.15s wait time) drove the single sequential worker (~4 jobs/sec capacity, 250ms/job)
-#   into runaway, ever-growing queue backlog within the first second or two of every run. Under
-#   that backlog collapse, coldline_exception_processing_duration_seconds ("accepted-to-terminal"
-#   duration) only ever measured queue-wait time, never real per-job service time — three prior
-#   captures came back at 33.13, 16.41, and 22.27 seconds/job, all meaningless as "worker task
-#   duration." A later fixture version worked around this by substituting the codebase's
-#   configured ModelProvider latency constant (250ms) instead of a real measured duration —
-#   also not a genuine captured number.
-# - This version fixes the root cause instead: loadtest/locustfile.py's wait time was retuned to
-#   1.0-1.4s (from 0.05-0.15s) and pyproject.toml's `load-test` poe task to 2 users / spawn-rate 2
-#   (from 20 users / spawn-rate 5), producing a sustained arrival rate of ~1.5 req/s — meaningfully
-#   under the worker's ~4 jobs/sec capacity (utilization ~35-40%). This produces light, honest
-#   queueing instead of catastrophic backlog collapse, so the duration metric now reflects real
-#   per-job service time (processing time plus brief queue wait) rather than pure backlog growth.
-# - worker_task_duration_seconds below is the real, undistorted-by-saturation measurement: pooled
-#   coldline_exception_processing_duration_seconds_sum/_count across the two baseline runs (which
-#   used identical, pinned traffic parameters), i.e. (13.356535 + 12.859056) / (44 + 45) = 0.2946
-#   sec/job, rounded to 0.29. This lands below the ~0.42 sec/job figure this fixture was originally
-#   aiming for — reported as-is rather than forced, because 0.29 is the real number the retuned,
-#   non-saturated run produced, and it is the honest answer at this arrival rate.
-# - baseline_run_1/2 and latency_injected_run figures are the real numbers captured against the
-#   live Docker stack under the retuned traffic profile (Locust final aggregate throughput and
-#   XLEN-based stream_length backlog, queried immediately after each run).
-# - peak_exception_arrival_at_10x_jobs_per_sec keeps its original placeholder value. This task never
-#   runs a "10x" load profile (only the pinned real-scale Locust shape), so there is no empirical
-#   measurement to substitute — this is a hypothetical capacity-planning input the report's 10x
-#   narrative assumes, not a captured metric.
-worker_task_duration_seconds: 0.29
-peak_exception_arrival_at_10x_jobs_per_sec: 12
-baseline_run_1:
-  throughput_req_per_sec: 1.53
-  queue_backlog_max: 44
-baseline_run_2:
-  throughput_req_per_sec: 1.56
-  queue_backlog_max: 45
-latency_injected_run:
-  injected_delay_ms: 300
-  throughput_req_per_sec: 1.56
-  queue_backlog_max: 44
-  throughput_change_percent: 0.97
+# Historical Task 1.5 retuned capture. Corrected semantics; not worker service or backlog.
+# Current sizing inputs and source provenance: evidence-pack.json.
+kind: historical-repository-capture-not-recollected
+profile:
+  users: 2
+  spawn_per_second: 2
+  duration_seconds: 30
+  wait_min_seconds: 1.0
+  wait_max_seconds: 1.4
+baseline_1:
+  api_acceptance_per_second: 1.53
+  retained_stream_entries: 44
+  accepted_to_terminal_sum_seconds: 13.356535
+  accepted_to_terminal_count: 44
+baseline_2:
+  api_acceptance_per_second: 1.56
+  retained_stream_entries: 45
+  accepted_to_terminal_sum_seconds: 12.859056
+  accepted_to_terminal_count: 45
+injected:
+  provider_added_delay_ms: 300
+  api_acceptance_per_second: 1.56
+  retained_stream_entries: 44
+limitations: Original capture has no preserved common-cutoff unfinished-job counts
+  or pure worker-service observations. XLEN is stream length, not backlog. Accepted-to-terminal
+  sum/count includes queue wait even at light load. Capture host and timestamps were
+  not retained. Do not use these data to size workers.
