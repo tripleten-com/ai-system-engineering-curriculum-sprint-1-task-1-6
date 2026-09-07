@@ -176,12 +176,13 @@ the next Task. Sprint completion requires all six Task PRs CI-green and one fina
 instructor defense covering empirical reasoning, uncertainty, alternatives, and judgment.
 
 Task 1.6 also runs the Sprint's single isolated protected held-out telemetry/capacity
-scenario through the published interface on the supplied trusted default-branch runtime.
+scenario through the published interface on the supplied trusted template runtime.
 It is a runtime regression check, independent of candidate YAML answers and Markdown;
 it does not assess student diagnostic judgment. Its result is separate from public CI; a
-missing or skipped check is not a pass. Keep protected workflows and evaluator code
-unchanged. The Markdown record prepares the final defense and has no separate
-instructor answer grade; automated answer acceptance does not certify its prose.
+missing or skipped check is not a pass. The course runs protected grading through its
+CMS integration; keep the supplied evaluator code unchanged. The Markdown record prepares
+the final defense and has no separate instructor answer grade; automated answer acceptance
+does not certify its prose.
 
 ### Student walkthrough
 
